@@ -51,10 +51,10 @@ class MyButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onTap,
         style: ButtonStyle(
-          padding: MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 10)),
-          backgroundColor: MaterialStatePropertyAll(MAROON),
-          foregroundColor: MaterialStatePropertyAll(WHITE),
-          shape: MaterialStateProperty.all(
+          padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 10)),
+          backgroundColor: const WidgetStatePropertyAll(MAROON),
+          foregroundColor: const WidgetStatePropertyAll(WHITE),
+          shape: WidgetStateProperty.all(
 
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),

@@ -7,17 +7,20 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 class ViewPage extends StatefulWidget {
   final String startTime;
   final String endTime;
-  final String profName;
+  final String? profName;
   final String subjectName;
   final int schedId;
+  final String section;
 
   const ViewPage({
     required this.startTime,
     required this.endTime,
-    required this.profName,
+    this.profName,
     required this.subjectName,
     required this.schedId,
+    required this.section,
     super.key,
+    
   });
 
   @override
@@ -65,7 +68,7 @@ class ViewPageState extends State<ViewPage> {
                     SizedBox(height: 8),
 
                     Text(
-                      'Teacher',
+                      'Section',
                       style: TextStyle(fontWeight: FontWeight.bold, color: WHITE),
                     ),
 
@@ -86,7 +89,7 @@ class ViewPageState extends State<ViewPage> {
                     const SizedBox(height: 8),
 
                     Text(
-                      widget.profName,
+                      widget.section,
                       style: const TextStyle(fontWeight: FontWeight.bold, color: WHITE),
                     ),
 

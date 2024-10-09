@@ -41,13 +41,13 @@ class ScheduleListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          schedule.startTime,
+                          schedule.startTime, //ANCHOR - START TIME
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
+                        Text( //ANCHOR - ENDTIME
                           schedule.endTime,
                           style: const TextStyle(
                             fontSize: 13,
@@ -94,8 +94,9 @@ class ScheduleListItem extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+
                             Text(
-                              schedule.subject,
+                              schedule.subject, //ANCHOR - SUBJECT
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -103,8 +104,9 @@ class ScheduleListItem extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 5),
-                            Text(
-                              schedule.profName,
+
+                            Text( 
+                              schedule.section, //ANCHOR - SECTION
                               style: TextStyle(
                                 fontSize: 12,
                                 color: isCurrentTime ? Colors.white : Colors.black,

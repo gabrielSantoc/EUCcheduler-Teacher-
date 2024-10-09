@@ -70,11 +70,24 @@ class TeacherScreenState extends State<TeacherScreen> {
         filePath: data['file_path']
       );
     }
-    await boxUserCredentials.put("filePath", userInfo!.filePath);
-    await boxUserCredentials.put("section", userInfo!.section);
+
+    //para sure na may laman
+    if (userInfo!.filePath != null) {
+      await boxUserCredentials.put("filePath", "${userInfo!.filePath}");
+    }
+
+    if (userInfo!.firstName != null && userInfo!.lastName != null) {
+      await boxUserCredentials.put("profName", "${userInfo!.firstName} ${userInfo!.lastName}");
+    }
+  
+
+
+    // await boxUserCredentials.put("filePath", "${userInfo!.filePath}");
+    // await boxUserCredentials.put("profName", "${userInfo!.firstName} ${userInfo!.lastName}");
+    
+    print("PROF FULL NAME HIVEEE::: ${boxUserCredentials.get("profName")}");
     //to make sure hive has content before fetching profile picture
     loadProfileImage();
-    print("SECTIONNNN :::: ${boxUserCredentials.get("section")}");
     setState(() {});
   }
 
@@ -86,17 +99,29 @@ class TeacherScreenState extends State<TeacherScreen> {
     // Ensure the size doesn't exceed a maximum value
     size = size.clamp(40, 50).toDouble();
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+
+        },
+        
+        shape: const CircleBorder(),
+        backgroundColor: MAROON,
+        child: const Icon(
+          Icons.add,
+          color: WHITE,
+        ),
+      ),
       backgroundColor: MAROON,
       appBar: AppBar(
         backgroundColor: MAROON,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: CircleAvatar(
               backgroundImage: profileImageUrl != null
               ? NetworkImage(profileImageUrl!)
-              : AssetImage('assets/images/placeholder.png')
+              : const AssetImage('assets/images/placeholder.png')
               as ImageProvider,
             ),
           ),
@@ -136,25 +161,24 @@ class TeacherScreenState extends State<TeacherScreen> {
                 ),
 
                 const SizedBox(height: 6),
-                userInfo != null
-                ? 
-                Text(
-                  "${userInfo!.section}",
+                // userInfo != null
+                const Text(
+                  "Professor",
                   style: const TextStyle(
                     fontSize: 20,
                     color: WHITE,
                   ),
                 )
-                : Shimmer(
-                  child: Container(
-                    height: 30,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(26, 158, 158, 158),
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                  )
-                ),
+                // : Shimmer(
+                //   child: Container(
+                //     height: 30,
+                //     width: 100,
+                //     decoration: BoxDecoration(
+                //       color: const Color.fromARGB(26, 158, 158, 158),
+                //       borderRadius: BorderRadius.circular(10)
+                //     ),
+                //   )
+                // ),
               ],
             ),
           ),
@@ -241,8 +265,12 @@ class ScheduleList extends StatefulWidget {
   final ScrollController scrollController;
   final VoidCallback refreshUserInfo;
 
-  const ScheduleList(
-      {super.key, required this.selectedDay, required this.scrollController, required this.refreshUserInfo});
+  const ScheduleList({
+    super.key, 
+    required this.selectedDay, 
+    required this.scrollController, 
+    required this.refreshUserInfo
+  });
 
   @override
   State<ScheduleList> createState() => _ScheduleListState();
@@ -254,7 +282,8 @@ class _ScheduleListState extends State<ScheduleList> {
   Map<int, bool> newAnnouncementsMap = {};
   late Box<String> announcementsBox;
   Map<int, String> latestAnnouncementTimes = {};
-  late String section = boxUserCredentials.get("section");
+
+  late String profName = boxUserCredentials.get("profName");
 
   @override
   void initState() {
@@ -280,11 +309,14 @@ class _ScheduleListState extends State<ScheduleList> {
   Future<List<SchedModel>> fetchSched() async {
     // If section is not provided, wait for it to be available in Hive
     await waitForSection();
-    section = boxUserCredentials.get("section");
+    profName = boxUserCredentials.get("profName");
 
     try {
       final response =
-          await supabase.from('tbl_schedule').select().eq('section', section);
+        await supabase
+        .from('tbl_schedule')
+        .select()
+        .eq('professor_name', profName);
 
       return SchedModel.jsonToList(response);
     } catch (e) {
@@ -294,7 +326,7 @@ class _ScheduleListState extends State<ScheduleList> {
   }
 
   Future<void> waitForSection() async {
-    while (boxUserCredentials.get("section") == null) {
+    while (boxUserCredentials.get("profName") == null) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
   }
@@ -371,32 +403,46 @@ class _ScheduleListState extends State<ScheduleList> {
 
   @override
   Widget build(BuildContext context) {
+
     return RefreshIndicator(
       onRefresh: loadData,
       child: FutureBuilder<List<SchedModel>>(
         future: schedFuture,
         builder: (context, snapshot) {
+
           if (snapshot.connectionState == ConnectionState.waiting) {
+
             return Column(
+
               children: [
+
                 const SizedBox(height: 50),
+
                 Center(
                   child: LoadingAnimationWidget.staggeredDotsWave(
                     color: MAROON,
                     size: 50,
                   ),
                 ),
+
                 const SizedBox(height: 10),
+
                 const Text(
                   "Just a moment, retrieving schedule...",
                   style: TextStyle(color: GRAY, fontSize: 15),
                 )
+
               ],
             );
+
           } else if (snapshot.hasError) {
+
             return Center(child: Text('Error: ${snapshot.error}'));
+
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+
             return const Center(child: Text('No schedules available'));
+            
           }
 
           List<SchedModel> allSched = snapshot.data!;
@@ -411,26 +457,31 @@ class _ScheduleListState extends State<ScheduleList> {
             itemBuilder: (context, index) {
               var schedule = filteredSchedules[index];
               bool isCurrentTime = checkIfCurrentTime(
-                  schedule.startTime, schedule.endTime, schedule.dayOfWeek);
+                schedule.startTime,
+                schedule.endTime,
+                schedule.dayOfWeek
+              );
+
               print("DAY OF WEEEEK :::: ${schedule.dayOfWeek}");
-              bool hasNewAnnouncement =
-                  newAnnouncementsMap[schedule.schedId] ?? false;
+
+              bool hasNewAnnouncement = newAnnouncementsMap[schedule.schedId] ?? false;
 
               return ScheduleListItem(
                 schedule: schedule,
                 isCurrentTime: isCurrentTime,
                 hasNewAnnouncement: hasNewAnnouncement,
                 onTap: () {
-                  updateLastViewedTime(schedule
-                      .schedId); //only updates hive when sched is tapped
+                  updateLastViewedTime(
+                    schedule.schedId
+                  ); //only updates hive when sched is tapped
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => ViewPage(
                         startTime: schedule.startTime,
                         endTime: schedule.endTime,
-                        profName: schedule.profName,
                         subjectName: schedule.subject,
+                        section: schedule.section,
                         schedId: schedule.schedId,
                       ),
                     ),
