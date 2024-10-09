@@ -4,7 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/model/schedule_model.dart';
 import 'package:schedule_profs/model/user_model.dart';
+import 'package:schedule_profs/screens/add_announcement.dart';
+import 'package:schedule_profs/screens/add_subject.dart';
 import 'package:schedule_profs/screens/view_page.dart';
+import 'package:schedule_profs/shared/button.dart';
 import 'package:schedule_profs/shared/constants.dart';
 import 'package:schedule_profs/shared/schedule_list_item.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -99,18 +102,39 @@ class TeacherScreenState extends State<TeacherScreen> {
     // Ensure the size doesn't exceed a maximum value
     size = size.clamp(40, 50).toDouble();
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
 
+      // floatingActionButton: CustomFloatingActionButoon(
+      //   onTap: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context)=> const AddSubjectScreen())
+      //     );
+      //   },
+      // ),
+
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context)=> const AddSubjectScreen())
+          );
         },
-        
-        shape: const CircleBorder(),
         backgroundColor: MAROON,
-        child: const Icon(
-          Icons.add,
-          color: WHITE,
+        label: const Row(
+          children: [
+            Icon(Icons.add, color: WHITE),
+            SizedBox(width: 5),
+            Text(
+              "Add Subject",
+              style: TextStyle(
+                color: WHITE,
+                fontSize: 15,
+              ),
+            ),
+          ],
         ),
       ),
+
       backgroundColor: MAROON,
       appBar: AppBar(
         backgroundColor: MAROON,
@@ -164,7 +188,7 @@ class TeacherScreenState extends State<TeacherScreen> {
                 // userInfo != null
                 const Text(
                   "Professor",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     color: WHITE,
                   ),

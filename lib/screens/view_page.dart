@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:schedule_profs/model/announcement_model.dart';
+import 'package:schedule_profs/screens/add_announcement.dart';
+import 'package:schedule_profs/screens/edit_subject.dart';
+import 'package:schedule_profs/shared/button.dart';
 import 'package:schedule_profs/shared/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -38,17 +41,34 @@ class ViewPageState extends State<ViewPage> {
       backgroundColor: MAROON,
       appBar: AppBar(
         backgroundColor: MAROON,
+        iconTheme: const IconThemeData(color: WHITE),
       ),
+
+      floatingActionButton: CustomFloatingActionButoon(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context)=> const AddAnnouncementScreen())
+          );
+        }
+      ),
+      
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+
           Text(
             widget.subjectName,
             style: const TextStyle(
-                fontSize: 32, fontWeight: FontWeight.bold, color: WHITE),
+              fontSize: 32, 
+              fontWeight: FontWeight.bold, 
+              color: WHITE
+            ),
             textAlign: TextAlign.center,
           ),
+
           const SizedBox(height: 16),
+
           Padding(
             padding: const EdgeInsets.all(23),
             child: Row(
@@ -98,6 +118,19 @@ class ViewPageState extends State<ViewPage> {
               ],
             ),
           ),
+
+          MyButton2(
+            onTap: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context)=> const EditSubjectScreen())
+              );
+            }, 
+            buttonName: "Edit"
+          ),
+
+          const SizedBox(height: 10),
+
           Expanded(
             child: Container(
               decoration: const BoxDecoration(

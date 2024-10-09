@@ -7,7 +7,8 @@ class MyTextFormField extends StatelessWidget {
     required this.hintText,
     required this.obscureText,
     this.suffixIcon,
-    this.validator
+    this.validator,
+    this.maxLines
   });
 
   final controller;
@@ -15,6 +16,7 @@ class MyTextFormField extends StatelessWidget {
   final bool obscureText;
   final String? Function(String?)? validator;
   final Widget? suffixIcon;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +28,7 @@ class MyTextFormField extends StatelessWidget {
         obscureText: obscureText,
         validator: validator,
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        maxLines: maxLines,
         decoration: InputDecoration(  
           suffixIcon: suffixIcon,
           errorStyle: const TextStyle(
