@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:schedule_profs/auth/login.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/main.dart';
-import 'package:schedule_profs/model/section_model.dart';
 import 'package:schedule_profs/screens/teacher_screen.dart';
 import 'package:schedule_profs/shared/alert.dart';
 import 'package:schedule_profs/shared/button.dart';
@@ -20,13 +19,6 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterNewState extends State<RegisterScreen> {
 
-  @override
-  initState() {
-    // TODO: implement initState
-    super.initState();
-    
-    getAllAvailableSections();
-  }
 
   final _idNumberController = TextEditingController();
   final _firstNameController = TextEditingController();
@@ -170,37 +162,6 @@ class _RegisterNewState extends State<RegisterScreen> {
 
       print('BIRTHDAYYYY $formattedBirthDay'); 
     }
-  }
-
-  // Function to show the section picker
-  // List of sections
-
-  final List<String> _sections = [];
-  Future<void> getAllAvailableSections() async {
-    
-    try{
-      
-      final selectAllSection = await 
-      Supabase.instance.client
-      .from('tbl_section')
-      .select();
-      
-      for(var s in selectAllSection) {
-        var section = SectionModel(
-          sectionName: s['section']
-        );
-
-        _sections.add(s['section']);
-      }
-
-      for(var s in _sections) {
-        print("SECTION ::: $s");
-      }
-
-    } catch (e) {
-      print("ERROR ::: $e");
-    }
-
   }
 
   @override

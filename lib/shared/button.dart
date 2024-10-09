@@ -55,38 +55,77 @@ class MyButton extends StatelessWidget {
           backgroundColor: const WidgetStatePropertyAll(MAROON),
           foregroundColor: const WidgetStatePropertyAll(WHITE),
           shape: WidgetStateProperty.all(
-
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
               
             )
           )
         ),
-        child: Text(buttonName, style: const TextStyle(fontSize: 18)),
-        
+        child: Text(
+          buttonName, 
+          style: const TextStyle(
+            fontSize: 18
+          )
+        ),
+
       ),
     );
   }
 }
 
-//  Container(
-//         padding: 
-//         margin: const EdgeInsets.symmetric(horizontal: 30),
-//         decoration: const BoxDecoration(
-//           borderRadius: BorderRadius.all(Radius.circular(10)),
-//           color: 
-//         ),
-//         child: Center(
-//           child: Text(
-//             buttonName,
-//             style: const TextStyle(
-//               fontSize: 15,
-//               fontWeight: FontWeight.w700,
-//               color: Colors.white,
-//             ),
-//           ),
-//         ),
-//       ),
 
+class MyButton2 extends StatelessWidget {
+  const MyButton2({super.key, required this.onTap, required this.buttonName});
 
+  final void Function()? onTap;
+  final String buttonName;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 130,
+      child: OutlinedButton(
+      
+        style: OutlinedButton.styleFrom(
+          foregroundColor: WHITE,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+          ),
+          side: const BorderSide(
+            color: WHITE,
+            width: 2
+          ),
+        ),
+        onPressed: onTap,
+        child: Text(
+          buttonName, 
+          style: const TextStyle( 
+            fontSize: 15,
+            fontWeight:  FontWeight.bold
+          )
+        ),
+      ),
+    );
+  }
+}
+
+class CustomFloatingActionButoon extends StatelessWidget {
+  const CustomFloatingActionButoon({super.key, this.onTap});
+
+  
+  final void Function()? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: onTap,
+      shape: const CircleBorder(),
+      backgroundColor: MAROON,
+      child: const Icon(
+        Icons.add,
+        color: WHITE,
+      ),
+    );
+  }
+}
 
