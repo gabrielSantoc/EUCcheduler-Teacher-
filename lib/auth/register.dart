@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:schedule_profs/auth/login.dart';
 import 'package:schedule_profs/box/boxes.dart';
@@ -203,34 +202,6 @@ class _RegisterNewState extends State<RegisterScreen> {
     }
 
   }
-
-  // Future<void> selectSection() async {
-  //   // Show the Cupertino modal popup
-  //   await showCupertinoModalPopup<String>(
-  //     context: context,
-  //     builder: (_) {
-  //       return SizedBox(
-  //         width: double.infinity,
-  //         height: 250,
-  //         child: CupertinoPicker(
-  //           onSelectedItemChanged: (int value) {
-              
-  //             setState(() {
-  //               _sectionController.text = _sections[value];
-  //             });
-  //             print('SECTION :::: ${_sections[value]}'); 
-  //           },
-  //           backgroundColor: Colors.white,
-  //           itemExtent: 30,
-  //           scrollController: FixedExtentScrollController(
-  //             initialItem: 0, 
-  //           ),
-  //           children: _sections.map((section) => Text(section)).toList(),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {

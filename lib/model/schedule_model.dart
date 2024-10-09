@@ -5,6 +5,9 @@ class SchedModel {
   late final int schedId;
   late final String profName;
   late final String subject;
+
+  late final String section;
+  
   late final String startTime;
   late final String endTime;
   late final String dayOfWeek;
@@ -14,6 +17,9 @@ class SchedModel {
     required this.schedId,
     required this.profName,
     required this.subject,
+
+    required this.section,
+
     required String rawStartTime,
     required String rawEndTime,
     required this.dayOfWeek,
@@ -30,6 +36,7 @@ class SchedModel {
         schedId: json['schedule_id'],
         profName: json['professor_name'],
         subject: json['subject'],
+        section: json['section'],
         rawStartTime: json['start_time'],
         rawEndTime: json['end_time'],
         dayOfWeek: json['day_of_week'],

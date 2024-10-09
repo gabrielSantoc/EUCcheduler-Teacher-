@@ -1,8 +1,8 @@
 
 
 class UserModel {
-  late final String firstName;
-  late final String lastName;
+  late final String? firstName;
+  late final String? lastName;
   late final String email;
   late final String? section;
   late final String birthday;

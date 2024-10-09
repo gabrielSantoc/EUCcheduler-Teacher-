@@ -63,10 +63,10 @@ class DrawerClass extends StatelessWidget {
   final VoidCallback onProfileImageChanged;
 
   const DrawerClass({
-    Key? key, 
+    super.key, 
     required this.profileImageUrl,
     required this.onProfileImageChanged,
-  }) : super(key: key);
+  });
 
   Future<void> pickAndUploadImage() async {
     final picker = ImagePicker();
