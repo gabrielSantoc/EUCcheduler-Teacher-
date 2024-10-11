@@ -1,8 +1,6 @@
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/model/section_model.dart';
@@ -10,7 +8,6 @@ import 'package:schedule_profs/screens/teacher_screen.dart';
 import 'package:schedule_profs/shared/alert.dart';
 import 'package:schedule_profs/shared/button.dart';
 import 'package:schedule_profs/shared/constants.dart';
-import 'package:schedule_profs/shared/schedule_list_item.dart';
 import 'package:schedule_profs/shared/text_field.dart';
 import 'package:schedule_profs/shared/validators.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -159,7 +156,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
           formattedTimeEnd = formattedTime;
         });
       }
-      print("TIME SELECTED :::: ${formattedTime}");
+      print("TIME SELECTED :::: $formattedTime");
 
       var twelveHoursFormat = DateFormat('hh:mm a').format(
         DateTime(
@@ -171,14 +168,14 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         )
       );
       // controller.text = formattedTime;
-      print("12 HOURS FORMAT :::: ${twelveHoursFormat}");
+      print("12 HOURS FORMAT :::: $twelveHoursFormat");
       controller.text = twelveHoursFormat;
     }
     
   }
   
   // ANCHOR - ADD SUBJECT FUNCTION
-  addSubject(section, subjectName, day, timeStart, timeEnd) async {
+  void addSubject(String section, String subjectName, String day, String timeStart, String timeEnd) async {
 
     if(addSubjectFormKey.currentState!.validate()) {
       try {
