@@ -44,13 +44,27 @@ class ViewPageState extends State<ViewPage> {
         iconTheme: const IconThemeData(color: WHITE),
       ),
 
-      floatingActionButton: CustomFloatingActionButoon(
-        onTap: () {
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
           Navigator.push(
-            context,
+            context, 
             MaterialPageRoute(builder: (context)=> const AddAnnouncementScreen())
           );
-        }
+        },
+        backgroundColor: MAROON,
+        label: const Row(
+          children: [
+            Icon(Icons.add, color: WHITE),
+            SizedBox(width: 5),
+            Text(
+              "Add Announcement",
+              style: TextStyle(
+                color: WHITE,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
       
       body: Column(
@@ -126,7 +140,7 @@ class ViewPageState extends State<ViewPage> {
                 MaterialPageRoute(builder: (context)=> const EditSubjectScreen())
               );
             }, 
-            buttonName: "Edit"
+            buttonName: "Edit Subject"
           ),
 
           const SizedBox(height: 10),

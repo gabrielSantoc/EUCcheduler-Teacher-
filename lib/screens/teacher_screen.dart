@@ -83,8 +83,6 @@ class TeacherScreenState extends State<TeacherScreen> {
       await boxUserCredentials.put("profName", "${userInfo!.firstName} ${userInfo!.lastName}");
     }
   
-
-
     // await boxUserCredentials.put("filePath", "${userInfo!.filePath}");
     // await boxUserCredentials.put("profName", "${userInfo!.firstName} ${userInfo!.lastName}");
     
@@ -103,16 +101,7 @@ class TeacherScreenState extends State<TeacherScreen> {
     size = size.clamp(40, 50).toDouble();
     return Scaffold(
 
-      // floatingActionButton: CustomFloatingActionButoon(
-      //   onTap: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (context)=> const AddSubjectScreen())
-      //     );
-      //   },
-      // ),
-
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton.extended( //ANCHOR - FLOATING ACTION BUTTON
         onPressed: () {
           Navigator.push(
             context, 
@@ -128,7 +117,7 @@ class TeacherScreenState extends State<TeacherScreen> {
               "Add Subject",
               style: TextStyle(
                 color: WHITE,
-                fontSize: 15,
+                fontSize: 12,
               ),
             ),
           ],
@@ -340,7 +329,8 @@ class _ScheduleListState extends State<ScheduleList> {
         await supabase
         .from('tbl_schedule')
         .select()
-        .eq('professor_name', profName);
+        .eq('professor_name', profName)
+        .order('start_time', ascending: true);
 
       return SchedModel.jsonToList(response);
     } catch (e) {
@@ -366,8 +356,7 @@ class _ScheduleListState extends State<ScheduleList> {
       String createdAt = announcement['created_at'];
 
       // Store the latest created_at for each schedule
-      if (!latestAnnouncementTimes.containsKey(schedId) ||
-          createdAt.compareTo(latestAnnouncementTimes[schedId]!) > 0) {
+      if (!latestAnnouncementTimes.containsKey(schedId) || createdAt.compareTo(latestAnnouncementTimes[schedId]!) > 0) {
         latestAnnouncementTimes[schedId] = createdAt;
       }
 
@@ -397,10 +386,8 @@ class _ScheduleListState extends State<ScheduleList> {
     final lowerBound = scheduleStartTime.subtract(const Duration(minutes: 1));
     final upperBound = scheduleEndTime;
 
-    print(
-        "TODAY DAY ${DateFormat('EEEE').format(now).toString().toLowerCase()}");
-    var currentDayName =
-        DateFormat('EEEE').format(now).toString().toLowerCase();
+    print("TODAY DAY ${DateFormat('EEEE').format(now).toString().toLowerCase()}");
+    var currentDayName = DateFormat('EEEE').format(now).toString().toLowerCase();
 
     return now.isAfter(lowerBound) && now.isBefore(upperBound) && currentDayName == dayOfWeek;
   }

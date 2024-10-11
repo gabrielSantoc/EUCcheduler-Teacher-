@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:intl/intl.dart';
+import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/model/section_model.dart';
 import 'package:schedule_profs/shared/button.dart';
 import 'package:schedule_profs/shared/constants.dart';
@@ -23,7 +26,8 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
   }
 
   final _sectionController = TextEditingController();
-  final _subjectName = TextEditingController();
+  final _subjectNameController = TextEditingController();
+  final _dayController = TextEditingController();
   final _timeStartController = TextEditingController();
   final _timeEndController = TextEditingController();
 
@@ -75,6 +79,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
 
   }
 
+  // ANCHOR - SELECT SECTION FUNCTION
   Future<void> selectSection() async {
     // Show the Cupertino modal popup
     await showCupertinoModalPopup<String>(
@@ -102,6 +107,111 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
       },
     );
   }
+
+  // ANCHOR - SELECT DAY FUNCTION
+  final List<String> _dayOfWeek = [ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ];
+  Future<void> selectDay() async {
+    // Show the Cupertino modal popup
+    await showCupertinoModalPopup<String>(
+      context: context,
+      builder: (_) {
+        return SizedBox(
+          width: double.infinity,
+          height: 250,
+          child: CupertinoPicker(
+            itemExtent: 30,
+            backgroundColor: Colors.white,
+            onSelectedItemChanged: (int value) {
+              
+              setState(() {
+                _dayController.text = _dayOfWeek[value];
+              });
+
+              print('SECTION :::: ${_dayOfWeek[value]}'); 
+            },
+            
+            scrollController: FixedExtentScrollController(
+              initialItem: 0, 
+            ),
+            children: _dayOfWeek.map((day) => Text(day)).toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  // ANCHOR - SELECT TIME FUNCTION
+  String formattedTimeStart = "";
+  String formattedTimeEnd = "";
+  Future<void> selectTime(TextEditingController controller, String whichTime) async{
+    final TimeOfDay? timePicked = await  showTimePicker(
+      context: context,
+      initialTime:  TimeOfDay.now(),
+    );
+
+    if(timePicked != null) {
+      var now = DateTime.now();
+      var formattedTime = DateFormat('HH:mm:ss').format(
+        DateTime(
+          now.year,
+          now.month, 
+          now.day, 
+          timePicked.hour, 
+          timePicked.minute
+        )
+      );
+      
+      if(whichTime == "start") {
+        setState(() {
+          formattedTimeStart = formattedTime;
+        });
+        
+      }
+      if (whichTime == "end") {
+        setState(() {
+          formattedTimeEnd = formattedTime;
+        });
+      }
+    
+
+      
+      print("TIME SELECTED :::: ${formattedTime}");
+
+      var twelveHoursFormat = DateFormat('hh:mm a').format(
+        DateTime(
+          now.year,
+          now.month, 
+          now.day, 
+          timePicked.hour, 
+          timePicked.minute
+        )
+      );
+      // controller.text = formattedTime;
+      print("12 HOURS FORMAT :::: ${twelveHoursFormat}");
+      controller.text = twelveHoursFormat;
+    }
+    
+  }
+  
+  // ANCHOR - ADD SUBJECT FUNCTION
+  addSubject(section, subjectName, day, timeStart, timeEnd) async {
+    await Supabase.instance.client
+    .from('tbl_schedule')
+    .insert({
+      'professor_name': boxUserCredentials.get("profName"),
+      'subject' : subjectName,
+      'section' : section,
+      'start_time' : timeStart,
+      'end_time' : timeEnd,
+      'day_of_week' : day,
+    });
+
+    print("PROFF NAME :::: ${boxUserCredentials.get("profName")}");
+    print("SCHEDULE ADDED SUCCESSFULLY");
+  }
+
+  
+
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +292,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                   
 
                       MyTextFormField(
-                        controller: _subjectName,
+                        controller: _subjectNameController,
                         hintText: "Subject Name",
                         obscureText: false,
                         validator:  (value)=> Validator.of(context).validateTextField(value, "Subject Name"),
@@ -190,8 +300,9 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
            
                       const SizedBox(height: 20),
 
-                      MyTextFormField(
-                        controller: _subjectName,
+                      ReadOnlyTextFormField(
+                        onTap: selectDay,
+                        controller: _dayController,
                         hintText: "Day",
                         obscureText: false,
                         validator:  (value)=> Validator.of(context).validateTextField(value, "Day"),
@@ -199,16 +310,22 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
            
                       const SizedBox(height: 20),
 
-                      MyTextFormField(
-                        controller: _timeEndController,
+                      ReadOnlyTextFormField(
+                        onTap: () {
+                          selectTime(_timeStartController, "start");
+                        },
+                        controller: _timeStartController,
                         hintText: "Time-Start",
                         obscureText: false,
-                        validator:  (value)=> Validator.of(context).validateTextField(value, "Tite"),
+                        validator:  (value)=> Validator.of(context).validateTextField(value, "Time-Start"),
                       ),
            
                       const SizedBox(height: 20),
 
-                      MyTextFormField(
+                      ReadOnlyTextFormField(
+                        onTap: () {
+                          selectTime(_timeEndController, "end");
+                        },
                         controller: _timeEndController,
                         hintText: "Time-End",
                         obscureText: false,
@@ -219,8 +336,16 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
 
                           
                       MyButton(
-                        onTap: () {
-                          
+                        onTap: () async{
+                          print("FORMATTED TIME START :::: $formattedTimeStart");
+                          print("FORMATTED TIME END :::: $formattedTimeEnd");
+                          addSubject(
+                            _sectionController.text.toString().trim(),
+                            _subjectNameController.text.toString().trim(),
+                            _dayController.text.toString().trim(),
+                            formattedTimeStart,
+                            formattedTimeEnd
+                          );
                         },
                         buttonName: "Save",
                       ),
