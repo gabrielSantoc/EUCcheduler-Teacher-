@@ -163,6 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Icon( obscureTextFlag ?Icons.visibility_off :Icons.visibility ),
                       ),
+                      maxLines: 1,
                     ),
                 
                     const SizedBox(height: 20),
