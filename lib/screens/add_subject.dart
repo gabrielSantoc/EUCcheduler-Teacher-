@@ -1,11 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/model/section_model.dart';
+import 'package:schedule_profs/screens/teacher_screen.dart';
+import 'package:schedule_profs/shared/alert.dart';
 import 'package:schedule_profs/shared/button.dart';
 import 'package:schedule_profs/shared/constants.dart';
+import 'package:schedule_profs/shared/schedule_list_item.dart';
 import 'package:schedule_profs/shared/text_field.dart';
 import 'package:schedule_profs/shared/validators.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -31,25 +36,8 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
   final _timeStartController = TextEditingController();
   final _timeEndController = TextEditingController();
 
-  final registerFormKey = GlobalKey<FormState>();
+  final addSubjectFormKey = GlobalKey<FormState>();
 
-  // FUNCTION TO INSERT THE NEW USER INTO THE DB
-  createUser(idNumber, firstName, lastName, birthdate, email, userId ) async {
-    await Supabase.instance.client
-    .from('tbl_users')
-    .insert({
-      'first_name': firstName,
-      'last_name' : lastName,
-      'email' : email,
-      'section' : null,
-      'id_number' : idNumber,
-      'user_type' : 'professor',
-      'birthday' : birthdate,
-      'auth_id' : userId
-    });
-
-    print("USER CREATED SUCCESSFULLY");
-  }
 
   final List<String> _sections = [];
   Future<void> getAllAvailableSections() async {
@@ -165,16 +153,12 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         setState(() {
           formattedTimeStart = formattedTime;
         });
-        
       }
       if (whichTime == "end") {
         setState(() {
           formattedTimeEnd = formattedTime;
         });
       }
-    
-
-      
       print("TIME SELECTED :::: ${formattedTime}");
 
       var twelveHoursFormat = DateFormat('hh:mm a').format(
@@ -195,23 +179,35 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
   
   // ANCHOR - ADD SUBJECT FUNCTION
   addSubject(section, subjectName, day, timeStart, timeEnd) async {
-    await Supabase.instance.client
-    .from('tbl_schedule')
-    .insert({
-      'professor_name': boxUserCredentials.get("profName"),
-      'subject' : subjectName,
-      'section' : section,
-      'start_time' : timeStart,
-      'end_time' : timeEnd,
-      'day_of_week' : day,
-    });
 
-    print("PROFF NAME :::: ${boxUserCredentials.get("profName")}");
-    print("SCHEDULE ADDED SUCCESSFULLY");
+    if(addSubjectFormKey.currentState!.validate()) {
+      try {
+        await Supabase.instance.client
+        .from('tbl_schedule')
+        .insert({
+          'professor_name': boxUserCredentials.get("profName"),
+          'subject' : subjectName,
+          'section' : section,
+          'start_time' : timeStart,
+          'end_time' : timeEnd,
+          'day_of_week' : day,
+        });
+
+        print("PROFF NAME :::: ${boxUserCredentials.get("profName")}");
+        print("SCHEDULE ADDED SUCCESSFULLY");
+        
+        Alert.of(context).showSuccess("SCHEDULE ADDED SUCCESSFULLY🥰🥰🥰");
+        // Navigator.pop(context); => Mas efficient sana to kaso hindi ma rerebuild yung widget
+        // ito na lang muna pansamantagal
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context)=> const TeacherScreen())
+        );
+      }catch (e) {
+        Alert.of(context).showError("$e 😢😢😢");
+      }
+    }
   }
-
-  
-
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +268,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                 ],
               ),
               child: Form(
-                key: registerFormKey,
+                key: addSubjectFormKey,
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -329,7 +325,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                         controller: _timeEndController,
                         hintText: "Time-End",
                         obscureText: false,
-                        validator:  (value)=> Validator.of(context).validateTextField(value, "Tite"),
+                        validator:  (value)=> Validator.of(context).validateTextField(value, "Time-end"),
                       ),
            
                       const SizedBox(height: 20),
