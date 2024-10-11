@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:schedule_profs/auth/login.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/main.dart';
@@ -153,14 +154,10 @@ class _RegisterNewState extends State<RegisterScreen> {
     if (picked != null) {
       birthDay = picked;
 
-      int year = birthDay.year;
-      int month = birthDay.month;
-      int day = birthDay.day;
+      var formattedBirthDay = DateFormat('yyyy-MM-dd');
+      _birthDateController.text = formattedBirthDay.format(birthDay);
 
-      String formattedBirthDay = "$year-$month-$day"; 
-      _birthDateController.text = formattedBirthDay;
-
-      print('BIRTHDAYYYY $formattedBirthDay'); 
+      print('BIRTHDAYYYY ::::: ${formattedBirthDay.format(birthDay)}');
     }
   }
 
