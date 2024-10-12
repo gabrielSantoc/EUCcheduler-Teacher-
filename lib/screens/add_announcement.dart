@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:schedule_profs/auth/login.dart';
 import 'package:schedule_profs/shared/button.dart';
 import 'package:schedule_profs/shared/constants.dart';
 import 'package:schedule_profs/shared/text_field.dart';

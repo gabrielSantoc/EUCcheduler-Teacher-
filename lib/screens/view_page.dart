@@ -14,6 +14,7 @@ class ViewPage extends StatefulWidget {
   final String subjectName;
   final int schedId;
   final String section;
+  final String day;
 
   const ViewPage({
     required this.startTime,
@@ -22,8 +23,8 @@ class ViewPage extends StatefulWidget {
     required this.subjectName,
     required this.schedId,
     required this.section,
+    required this.day,
     super.key,
-    
   });
 
   @override
@@ -31,6 +32,7 @@ class ViewPage extends StatefulWidget {
 }
 
 class ViewPageState extends State<ViewPage> {
+
   @override
   void initState() {
     super.initState();
@@ -133,11 +135,19 @@ class ViewPageState extends State<ViewPage> {
             ),
           ),
 
-          MyButton2(
+          MyButton2( // ANCHOR - PAGE ROUTE FOR EDIT SUBJECT SCREEN
             onTap: (){
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context)=> const EditSubjectScreen())
+                MaterialPageRoute(builder: (context)=> EditSubjectScreen( 
+                  schedId: widget.schedId,
+                  section: widget.section,
+                  subjectName: widget.subjectName,
+                  day: widget.day,
+                  startTime: widget.startTime,
+                  endTime: widget.endTime,
+
+                ))
               );
             }, 
             buttonName: "Edit Subject"
