@@ -59,6 +59,36 @@ class LoadingDialog {
 }
 
 
+void showConfirmDialog(BuildContext context, String title, String content, VoidCallback onConfirm) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: const Color.fromARGB(255, 155, 10, 0)
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: const Color.fromARGB(255, 155, 10, 0)
+            ),
+            onPressed: () {
+              onConfirm();
+              Navigator.of(context).pop();
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
 
 class DrawerClass extends StatelessWidget {

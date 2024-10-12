@@ -92,6 +92,20 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
     }
   }
 
+  // ANCHOR - DELETE SCHEDULE FUNCTION
+  deleteSchedule(scheduleId) async {
+    try{
+      await Supabase.instance.client
+      .from('tbl_schedule')
+      .delete()
+      .eq('schedule_id', scheduleId);
+      print("deleted successfully");
+      Alert.of(context).showSuccess("Schedule deleted successfully🥰🥰🥰");
+    } catch(e) {
+      Alert.of(context).showError("$e 😢😢😢");
+    }
+  }
+
   final List<String> _sections = [];
   Future<void> getAllAvailableSections() async {
     
@@ -196,7 +210,6 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
   @override
   Widget build(BuildContext context) {
     // LAMANAN YUNG MGA TEXTFIELD KUNG ALING SUBJECT YUNG PININDOT NILA
-
 
     return Scaffold(
       appBar: AppBar(
