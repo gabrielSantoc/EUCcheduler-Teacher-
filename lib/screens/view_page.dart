@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:schedule_profs/model/announcement_model.dart';
 import 'package:schedule_profs/screens/add_announcement.dart';
 import 'package:schedule_profs/screens/edit_subject.dart';
+import 'package:schedule_profs/screens/teacher_screen.dart';
+import 'package:schedule_profs/shared/alert.dart';
 import 'package:schedule_profs/shared/button.dart';
 import 'package:schedule_profs/shared/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -37,6 +39,25 @@ class ViewPageState extends State<ViewPage> {
   void initState() {
     super.initState();
   }
+
+  // ANCHOR - DELETE SCHEDULE FUNCTION
+  deleteSchedule() async {
+    try{
+      await Supabase.instance.client
+      .from('tbl_schedule')
+      .delete()
+      .eq('schedule_id', widget.schedId);
+      print("deleted successfully");
+      Navigator.push(
+        context, 
+        MaterialPageRoute(builder: (context)=> const TeacherScreen())
+      );
+      Alert.of(context).showSuccess("Schedule deleted successfully🥰🥰🥰");
+    } catch(e) {
+      Alert.of(context).showError("$e 😢😢😢");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +65,20 @@ class ViewPageState extends State<ViewPage> {
       appBar: AppBar(
         backgroundColor: MAROON,
         iconTheme: const IconThemeData(color: WHITE),
+
+        actions: [
+          IconButton(
+            onPressed: () => showConfirmDialog(
+              context,
+              'Delete Subject',
+              'Are you sure you want to delete this Subject?',
+              deleteSchedule
+            ),
+            icon: const Icon(Icons.delete, color: WHITE,),
+          ),
+        ],
       ),
+      
 
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
