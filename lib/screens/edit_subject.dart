@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/model/section_model.dart';
+import 'package:schedule_profs/screens/teacher_screen.dart';
+import 'package:schedule_profs/shared/alert.dart';
 import 'package:schedule_profs/shared/button.dart';
 import 'package:schedule_profs/shared/constants.dart';
 import 'package:schedule_profs/shared/text_field.dart';
@@ -8,7 +11,25 @@ import 'package:schedule_profs/shared/validators.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditSubjectScreen extends StatefulWidget {
-  const EditSubjectScreen({super.key});
+  const EditSubjectScreen({
+    super.key,
+    required this.schedId, 
+    required this.section,
+    required this.subjectName, 
+    required this.day,
+    required this.startTime, 
+    required this.endTime,
+    this.profName, 
+  });
+
+
+  final int schedId;
+  final String section;
+  final String subjectName;
+  final String day;
+  final String startTime;
+  final String endTime;
+  final String? profName;
 
   @override
   State<EditSubjectScreen> createState() => _EditSubjectStateScreen();
@@ -20,31 +41,55 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
   void initState() {
     super.initState();
     getAllAvailableSections();
+    fillOutForm(
+      widget.section,
+      widget.subjectName,
+      widget.day,
+      widget.startTime, 
+      widget.endTime
+    );
   }
 
   final _sectionController = TextEditingController();
-  final _subjectName = TextEditingController();
+  final _subjectNameController = TextEditingController();
+  final _dayController = TextEditingController();
   final _timeStartController = TextEditingController();
   final _timeEndController = TextEditingController();
 
-  final registerFormKey = GlobalKey<FormState>();
+  final editSubjectFormKey = GlobalKey<FormState>();
 
-  // FUNCTION TO INSERT THE NEW USER INTO THE DB
-  createUser(idNumber, firstName, lastName, birthdate, email, userId ) async {
-    await Supabase.instance.client
-    .from('tbl_users')
-    .insert({
-      'first_name': firstName,
-      'last_name' : lastName,
-      'email' : email,
-      'section' : null,
-      'id_number' : idNumber,
-      'user_type' : 'professor',
-      'birthday' : birthdate,
-      'auth_id' : userId
-    });
+ 
 
-    print("USER CREATED SUCCESSFULLY");
+  // ANCHOR - EDIT SUBJECT FUNCTION
+  void editSubject(int scheduleId, String section, String subjectName, String day, String timeStart, String timeEnd) async {
+
+    if(editSubjectFormKey.currentState!.validate()) {
+      try {
+        await Supabase.instance.client
+        .from('tbl_schedule')
+        .update({
+          'section' : section,
+          'subject' : subjectName,
+          'day_of_week' : day,
+          'start_time' : timeStart,
+          'end_time' : timeEnd,
+        })
+        .eq("schedule_id", scheduleId);
+
+        print("PROFF NAME :::: ${boxUserCredentials.get("profName")}");
+        print("SCHEDULE UPDATED SUCCESSFULLY");
+        
+        Alert.of(context).showSuccess("Schedule updated successfully🥰🥰🥰");
+        // Navigator.pop(context); => Mas efficient sana to kaso hindi ma rerebuild yung widget
+        // ito na lang muna pansamantagal
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context)=> const TeacherScreen())
+        );
+      }catch (e) {
+        Alert.of(context).showError("$e 😢😢😢");
+      }
+    }
   }
 
   final List<String> _sections = [];
@@ -103,8 +148,56 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
     );
   }
 
+  // ANCHOR - SELECT DAY FUNCTION
+  final List<String> _dayOfWeek = [ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ];
+  Future<void> selectDay() async {
+    // Show the Cupertino modal popup
+    await showCupertinoModalPopup<String>(
+      context: context,
+      builder: (_) {
+        return SizedBox(
+          width: double.infinity,
+          height: 250,
+          child: CupertinoPicker(
+            itemExtent: 30,
+            backgroundColor: Colors.white,
+            onSelectedItemChanged: (int value) {
+              
+              setState(() {
+                _dayController.text = _dayOfWeek[value];
+              });
+
+              print('SECTION :::: ${_dayOfWeek[value]}'); 
+            },
+            
+            scrollController: FixedExtentScrollController(
+              initialItem: 0, 
+            ),
+            children: _dayOfWeek.map((day) => Text(day)).toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  void fillOutForm(String section, String subjectName, String day, String timeStart, String timEnd) {
+
+    _sectionController.text = section;
+    _subjectNameController.text = subjectName;
+    _dayController.text = day;
+    _timeStartController.text = timeStart;
+    _timeEndController.text = timEnd;
+
+    print("START-TIME :::: ${widget.startTime}");
+    print("END-TIME   :::: ${widget.endTime}");
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    // LAMANAN YUNG MGA TEXTFIELD KUNG ALING SUBJECT YUNG PININDOT NILA
+
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: MAROON,
@@ -163,7 +256,7 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
                 ],
               ),
               child: Form(
-                key: registerFormKey,
+                key: editSubjectFormKey,
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -183,7 +276,7 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
                   
 
                       MyTextFormField(
-                        controller: _subjectName,
+                        controller: _subjectNameController,
                         hintText: "Subject Name",
                         obscureText: false,
                         validator:  (value)=> Validator.of(context).validateTextField(value, "Tite"),
@@ -191,8 +284,18 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
            
                       const SizedBox(height: 20),
 
+                      ReadOnlyTextFormField(
+                        onTap: selectDay,
+                        controller: _dayController,
+                        hintText: "Day",
+                        obscureText: false,
+                        validator:  (value)=> Validator.of(context).validateTextField(value, "Day"),
+                      ),
+
+                      const SizedBox(height: 20),
+
                       MyTextFormField(
-                        controller: _timeEndController,
+                        controller: _timeStartController,
                         hintText: "Time-Start",
                         obscureText: false,
                         validator:  (value)=> Validator.of(context).validateTextField(value, "Tite"),
@@ -211,10 +314,17 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
 
                           
                       MyButton(
-                        onTap: () {
-                          
+                        onTap: () async{
+                          editSubject(
+                            widget.schedId,
+                            _sectionController.text,
+                            _subjectNameController.text,
+                            _dayController.text,
+                            _timeStartController.text,
+                            _timeEndController.text
+                          );
                         },
-                        buttonName: "Save",
+                        buttonName: "Update",
                       ),
 
                       const SizedBox(height: 15),

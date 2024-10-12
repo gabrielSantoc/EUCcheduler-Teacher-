@@ -4,10 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/model/schedule_model.dart';
 import 'package:schedule_profs/model/user_model.dart';
-import 'package:schedule_profs/screens/add_announcement.dart';
 import 'package:schedule_profs/screens/add_subject.dart';
 import 'package:schedule_profs/screens/view_page.dart';
-import 'package:schedule_profs/shared/button.dart';
 import 'package:schedule_profs/shared/constants.dart';
 import 'package:schedule_profs/shared/schedule_list_item.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -494,6 +492,7 @@ class _ScheduleListState extends State<ScheduleList> {
                         subjectName: schedule.subject,
                         section: schedule.section,
                         schedId: schedule.schedId,
+                        day: schedule.dayOfWeek,
                       ),
                     ),
                   );

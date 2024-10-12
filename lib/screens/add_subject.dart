@@ -205,7 +205,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
       }
     }
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
