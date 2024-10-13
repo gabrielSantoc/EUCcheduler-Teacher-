@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_profs/box/boxes.dart';
+import 'package:schedule_profs/screens/teacher_screen.dart';
+import 'package:schedule_profs/shared/alert.dart';
 import 'package:schedule_profs/shared/button.dart';
 import 'package:schedule_profs/shared/constants.dart';
 import 'package:schedule_profs/shared/text_field.dart';
@@ -6,8 +9,12 @@ import 'package:schedule_profs/shared/validators.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddAnnouncementScreen extends StatefulWidget {
-  const AddAnnouncementScreen({super.key});
 
+  final int schedId;
+
+  const AddAnnouncementScreen({ required this.schedId, super.key});
+  
+  
   @override
   State<AddAnnouncementScreen> createState() => _RegisterNewState();
 }
@@ -17,24 +24,36 @@ class _RegisterNewState extends State<AddAnnouncementScreen> {
   final _titeController = TextEditingController();
   final _contentController = TextEditingController();
 
-  final registerFormKey = GlobalKey<FormState>();
+  final addAnnouncementFormKey = GlobalKey<FormState>();
 
-  // FUNCTION TO INSERT THE NEW USER INTO THE DB
-  createUser(idNumber, firstName, lastName, birthdate, email, userId ) async {
-    await Supabase.instance.client
-    .from('tbl_users')
-    .insert({
-      'first_name': firstName,
-      'last_name' : lastName,
-      'email' : email,
-      'section' : null,
-      'id_number' : idNumber,
-      'user_type' : 'professor',
-      'birthday' : birthdate,
-      'auth_id' : userId
-    });
+   // ANCHOR - ADD SUBJECT FUNCTION
+  void addAnouncement(int scheduleId, DateTime createdAt, String title, String content) async {
 
-    print("USER CREATED SUCCESSFULLY");
+    if(addAnnouncementFormKey.currentState!.validate()) {
+      try {
+        await Supabase.instance.client
+        .from('tbl_announcement')
+        .insert({
+          'schedule_id': scheduleId,
+          'created_at' : createdAt.toIso8601String(),
+          'title' : title,
+          'content' : content,
+        });
+
+        print("ANNOUNCEMENT ID :::: ${scheduleId}");
+        print("Announcement has been successfully added!");
+        
+        Alert.of(context).showSuccess("Announcement has been successfully added!🥰🥰🥰");
+        // Navigator.pop(context); => Mas efficient sana to kaso hindi ma rerebuild yung widget
+        // ito na lang muna pansamantagal
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context)=> const TeacherScreen())
+        );
+      }catch (e) {
+        Alert.of(context).showError("$e 😢😢😢");
+      }
+    }
   }
 
   @override
@@ -105,7 +124,7 @@ class _RegisterNewState extends State<AddAnnouncementScreen> {
                 ],
               ),
               child: Form(
-                key: registerFormKey,
+                key: addAnnouncementFormKey,
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +155,14 @@ class _RegisterNewState extends State<AddAnnouncementScreen> {
                           
                       MyButton(
                         onTap: () {
-                          
+                          var createdAt = DateTime.now();
+                          print("CREATED AT ::::: $createdAt");
+                          addAnouncement(
+                            widget.schedId,
+                            createdAt,
+                            _titeController.text.toString().trim(),
+                            _contentController.text.toString().trim(),
+                          );
                         },
                         buttonName: "Publish",
                       ),

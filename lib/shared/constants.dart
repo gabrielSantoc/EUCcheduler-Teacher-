@@ -72,7 +72,7 @@ void showConfirmDialog(BuildContext context, String title, String content, VoidC
               foregroundColor: const Color.fromARGB(255, 155, 10, 0)
             ),
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: const Text('Cancel 😁'),
           ),
           TextButton(
             style: TextButton.styleFrom(
@@ -82,7 +82,7 @@ void showConfirmDialog(BuildContext context, String title, String content, VoidC
               onConfirm();
               Navigator.of(context).pop();
             },
-            child: const Text('Delete'),
+            child: const Text('Delete 😔'),
           ),
         ],
       );
