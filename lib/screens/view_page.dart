@@ -10,21 +10,21 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ViewPage extends StatefulWidget {
-  final String startTime;
-  final String endTime;
+  final int schedId;
   final String? profName;
   final String subjectName;
-  final int schedId;
   final String section;
+  final String startTime;
+  final String endTime;
   final String day;
 
   const ViewPage({
-    required this.startTime,
-    required this.endTime,
+    required this.schedId,
     this.profName,
     required this.subjectName,
-    required this.schedId,
     required this.section,
+    required this.startTime,
+    required this.endTime,
     required this.day,
     super.key,
   });
@@ -41,7 +41,7 @@ class ViewPageState extends State<ViewPage> {
   }
 
   // ANCHOR - DELETE SCHEDULE FUNCTION
-  deleteSchedule() async {
+  deleteSubject() async {
     try{
       await Supabase.instance.client
       .from('tbl_schedule')
@@ -72,7 +72,7 @@ class ViewPageState extends State<ViewPage> {
               context,
               'Delete Subject',
               'Are you sure you want to delete this Subject?',
-              deleteSchedule
+              deleteSubject
             ),
             icon: const Icon(Icons.delete, color: WHITE,),
           ),
@@ -84,21 +84,25 @@ class ViewPageState extends State<ViewPage> {
         onPressed: () {
           Navigator.push(
             context, 
-            MaterialPageRoute(builder: (context)=> const AddAnnouncementScreen())
+            MaterialPageRoute(builder: (context)=> AddAnnouncementScreen(schedId: widget.schedId))
           );
         },
         backgroundColor: MAROON,
         label: const Row(
           children: [
+
             Icon(Icons.add, color: WHITE),
+            
             SizedBox(width: 5),
+
             Text(
               "Add Announcement",
               style: TextStyle(
                 color: WHITE,
                 fontSize: 12,
               ),
-            ),
+            )
+
           ],
         ),
       ),
@@ -179,8 +183,7 @@ class ViewPageState extends State<ViewPage> {
                   subjectName: widget.subjectName,
                   day: widget.day,
                   startTime: widget.startTime,
-                  endTime: widget.endTime,
-
+                  endTime: widget.endTime
                 ))
               );
             }, 
