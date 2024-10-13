@@ -43,12 +43,12 @@ class ViewPageState extends State<ViewPage> {
   }
 
   // ANCHOR - DELETE SCHEDULE FUNCTION
-  deleteSubject() async {
+  deleteSubject(int scheduleId) async {
     try{
       await Supabase.instance.client
       .from('tbl_schedule')
       .delete()
-      .eq('schedule_id', widget.schedId);
+      .eq('schedule_id', scheduleId);
       print("deleted successfully");
       Navigator.push(
         context, 
@@ -75,7 +75,9 @@ class ViewPageState extends State<ViewPage> {
               context,
               'Delete Subject',
               'Are you sure you want to delete this Subject?',
-              deleteSubject
+              (){
+                deleteSubject(widget.schedId);
+              }
             ),
             icon: const Icon(Icons.delete, color: WHITE,),
           ),
@@ -382,9 +384,14 @@ class _AnnouncementCardState extends State<AnnouncementCard> {
                               ),
                           
                               PopupMenuItem(
-                                onTap: (){
-                                  deleteAnnouncement(announcement.id);
-                                },
+                                onTap: () => showConfirmDialog(
+                                  context,
+                                  'Delete Announcement',
+                                  'Are you sure you want to delete this Announcment?',
+                                  (){
+                                    deleteAnnouncement(announcement.id);
+                                  }
+                                ),
                                 child: const ListTile(
                                   leading: Icon(Icons.delete),
                                   title: Text('Delete'),
