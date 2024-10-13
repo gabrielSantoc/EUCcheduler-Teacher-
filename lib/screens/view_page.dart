@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:schedule_profs/model/announcement_model.dart';
 import 'package:schedule_profs/screens/add_announcement.dart';
 import 'package:schedule_profs/screens/edit_subject.dart';
@@ -57,6 +59,7 @@ class ViewPageState extends State<ViewPage> {
       Alert.of(context).showError("$e 😢😢😢");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +223,9 @@ class ViewPageState extends State<ViewPage> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: AnnouncementCard(schedId: widget.schedId),
+                      child: AnnouncementCard(
+                        schedId: widget.schedId,
+                      ),
                     ),
                   ),
                   
@@ -237,7 +242,10 @@ class ViewPageState extends State<ViewPage> {
 class AnnouncementCard extends StatefulWidget {
   final int schedId;
 
-  const AnnouncementCard({required this.schedId, super.key});
+  const AnnouncementCard({
+    required this.schedId,
+    super.key
+  });
 
   @override
   State<AnnouncementCard> createState() => _AnnouncementCardState();
@@ -256,17 +264,36 @@ class _AnnouncementCardState extends State<AnnouncementCard> {
   Future<List<AnnouncementModel>> fetchAnnouncement() async {
     try {
       final response = await Supabase.instance.client
-          .from('tbl_announcement')
-          .select()
-          .eq('schedule_id', widget.schedId)
-          .order('id',ascending: false);
-
-          
+      .from('tbl_announcement')
+      .select()
+      .eq('schedule_id', widget.schedId)
+      .order('id',ascending: false);
 
       return AnnouncementModel.jsonToList(response);
+
     } catch (e) {
       print('Error fetching announcements: $e');
       return [];
+    }
+  }
+
+  
+  // ANCHOR - DELETE ANNOUNCEMENT FUNCTION
+  // TODO - pass the announcment id of the announcment to be delete in this funciton
+  deleteAnnouncement(int announcmentId) async {
+    try{
+      await Supabase.instance.client
+      .from('tbl_announcement')
+      .delete()
+      .eq('id', announcmentId);
+      print("Announcment was deleted successfully");
+      Navigator.push(
+        context, 
+        MaterialPageRoute(builder: (context)=> const TeacherScreen())
+      );
+      Alert.of(context).showSuccess("Announcment was deleted successfully🥰🥰🥰");
+    } catch(e) {
+      Alert.of(context).showError("$e 😢😢😢");
     }
   }
 
@@ -282,8 +309,11 @@ class _AnnouncementCardState extends State<AnnouncementCard> {
                 height: 50,
               ),
               Center(
-                  child: LoadingAnimationWidget.staggeredDotsWave(
-                      color: MAROON, size: 50)),
+                child: LoadingAnimationWidget.staggeredDotsWave(
+                  color: MAROON,
+                  size: 50
+                )
+              ),
               const SizedBox(
                 height: 10,
               ),
@@ -294,10 +324,15 @@ class _AnnouncementCardState extends State<AnnouncementCard> {
             ],
           );
         } else if (snapshot.hasError) {
+
           return Center(child: Text('Error: ${snapshot.error}'));
+
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+
           return const Center(child: Text('No announcements available.'));
+
         } else {
+
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
@@ -322,9 +357,50 @@ class _AnnouncementCardState extends State<AnnouncementCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       
-                      Text(
-                        announcement.title,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            announcement.title,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+
+                          PopupMenuButton( // ANCHOR - POP-UP MENU
+                            
+                            color: WHITE,
+                            padding: EdgeInsets.zero,
+                            itemBuilder: (context) => [
+                              
+                              PopupMenuItem(
+                                onTap: (){
+                                  
+                                },
+                                child: const ListTile(
+                                  leading: Icon(Icons.edit_document ),
+                                  title: Text('Edit'),
+                                ),
+                              ),
+                          
+                              PopupMenuItem(
+                                onTap: (){
+                                  deleteAnnouncement(announcement.id);
+                                },
+                                child: const ListTile(
+                                  leading: Icon(Icons.delete),
+                                  title: Text('Delete'),
+                                ),
+                              ),  
+                            ],
+                            child: Container(
+                              height: 36,
+                              width: 48,
+                              alignment: Alignment.centerRight,
+                              child: const Icon(
+                                Icons.more_vert,
+                              ),
+                            ),
+                          )
+                        ],
                       ),
 
                       const SizedBox(height: 8),

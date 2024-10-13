@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/screens/teacher_screen.dart';
 import 'package:schedule_profs/shared/alert.dart';
 import 'package:schedule_profs/shared/button.dart';
@@ -50,6 +49,7 @@ class _RegisterNewState extends State<AddAnnouncementScreen> {
           context, 
           MaterialPageRoute(builder: (context)=> const TeacherScreen())
         );
+        
       }catch (e) {
         Alert.of(context).showError("$e 😢😢😢");
       }
