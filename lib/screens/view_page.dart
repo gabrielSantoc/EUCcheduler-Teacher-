@@ -376,6 +376,7 @@ class _AnnouncementCardState extends State<AnnouncementCard> {
                               
                               PopupMenuItem( // ANCHOR - EDIT ANNOUNCEMENT
                                 onTap: (){
+                                  print("ANNOUNCEMENT ID ::::: ${announcement.id}");
                                   Navigator.push(
                                     context, 
                                     MaterialPageRoute(builder: (context)=>  EditAnnouncement(
