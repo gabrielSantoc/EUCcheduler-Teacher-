@@ -47,13 +47,14 @@ class _EditSubjectStateScreen extends State<EditAnnouncement> {
  
 
   // ANCHOR - EDIT SUBJECT FUNCTION
-  void editAnnouncement(int announcementId, String announcementTitle, String announcementContent) async {
+  editAnnouncement(int announcementId, DateTime createdAt, String announcementTitle, String announcementContent) async {
 
     if(editAnnouncementFormKey.currentState!.validate()) {
       try {
         await Supabase.instance.client
         .from('tbl_announcement')
         .update({
+          'created_at' : createdAt.toIso8601String(),
           'title' : announcementTitle,
           'content' : announcementContent,
         })
@@ -177,11 +178,11 @@ class _EditSubjectStateScreen extends State<EditAnnouncement> {
                       MyButton(
                         onTap: () {
                           var createdAt = DateTime.now();
-                          print("CREATED AT ::::: $createdAt");
                           editAnnouncement(
                             widget.announcementId,
-                            widget.title,
-                            widget.content
+                            createdAt,
+                            _titeController.text.toString().trim(),
+                            _contentController.text.toString().trim()
                           );
                         },
                         buttonName: "Publish",
