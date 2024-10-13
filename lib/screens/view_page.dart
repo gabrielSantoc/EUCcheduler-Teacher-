@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:schedule_profs/model/announcement_model.dart';
 import 'package:schedule_profs/screens/add_announcement.dart';
+import 'package:schedule_profs/screens/edit_announcement.dart';
 import 'package:schedule_profs/screens/edit_subject.dart';
 import 'package:schedule_profs/screens/teacher_screen.dart';
 import 'package:schedule_profs/shared/alert.dart';
@@ -43,7 +44,7 @@ class ViewPageState extends State<ViewPage> {
   }
 
   // ANCHOR - DELETE SCHEDULE FUNCTION
-  deleteSubject(int scheduleId) async {
+  void deleteSubject(int scheduleId) async {
     try{
       await Supabase.instance.client
       .from('tbl_schedule')
@@ -59,7 +60,6 @@ class ViewPageState extends State<ViewPage> {
       Alert.of(context).showError("$e 😢😢😢");
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -281,8 +281,7 @@ class _AnnouncementCardState extends State<AnnouncementCard> {
 
   
   // ANCHOR - DELETE ANNOUNCEMENT FUNCTION
-  // TODO - pass the announcment id of the announcment to be delete in this funciton
-  deleteAnnouncement(int announcmentId) async {
+  void deleteAnnouncement(int announcmentId) async {
     try{
       await Supabase.instance.client
       .from('tbl_announcement')
@@ -299,6 +298,8 @@ class _AnnouncementCardState extends State<AnnouncementCard> {
     }
   }
 
+  // TODO - EDIT ANNOUNCMENT
+  
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<AnnouncementModel>>(
@@ -373,17 +374,24 @@ class _AnnouncementCardState extends State<AnnouncementCard> {
                             padding: EdgeInsets.zero,
                             itemBuilder: (context) => [
                               
-                              PopupMenuItem(
+                              PopupMenuItem( // ANCHOR - EDIT ANNOUNCEMENT
                                 onTap: (){
-                                  
-                                },
+                                  Navigator.push(
+                                    context, 
+                                    MaterialPageRoute(builder: (context)=>  EditAnnouncement(
+                                      announcementId: announcement.id,
+                                      title: announcement.title,
+                                      content: announcement.content,
+                                    ))
+                                  );
+                                },  
                                 child: const ListTile(
                                   leading: Icon(Icons.edit_document ),
                                   title: Text('Edit'),
                                 ),
                               ),
                           
-                              PopupMenuItem(
+                              PopupMenuItem( // ANCHOR - DELETE ANNOUNCEMENT
                                 onTap: () => showConfirmDialog(
                                   context,
                                   'Delete Announcement',
