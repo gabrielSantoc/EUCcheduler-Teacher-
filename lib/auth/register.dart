@@ -39,7 +39,7 @@ class _RegisterNewState extends State<RegisterScreen> {
   Future<void> validateProfessor() async{  
 
     try {
-      final studentToSearch = await 
+      final profToSearch = await 
         Supabase.instance.client
         .from('tbl_profs')
         .select()
@@ -47,9 +47,9 @@ class _RegisterNewState extends State<RegisterScreen> {
         .eq('first_name', _firstNameController.text.trim().toUpperCase())
         .eq('last_name', _lastNameController.text.trim().toUpperCase());
     
-      if(studentToSearch.isNotEmpty) {
+      if(profToSearch.isNotEmpty) {
         print("PROF FOUND");
-        print("PROF TO SEARCH :::: $studentToSearch");
+        print("PROF TO SEARCH :::: $profToSearch");
         setState(() {
           isStudentBonafide = true;
         });
@@ -57,7 +57,7 @@ class _RegisterNewState extends State<RegisterScreen> {
       } 
       else {
         print("NOT FOUND");
-        print("PROF TO SEARCH :::: $studentToSearch");
+        print("PROF TO SEARCH :::: $profToSearch");
       } 
     } catch (e) {
       Alert.of(context).showError("$e");
