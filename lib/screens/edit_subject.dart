@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/model/section_model.dart';
 import 'package:schedule_profs/screens/teacher_screen.dart';
@@ -182,6 +183,55 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
     );
   }
 
+    // ANCHOR - SELECT TIME FUNCTION
+  String formattedTimeStart = "";
+  String formattedTimeEnd = "";
+  Future<void> selectTime(TextEditingController controller, String whichTime) async{
+    final TimeOfDay? timePicked = await  showTimePicker(
+      context: context,
+      initialTime:  TimeOfDay.now(),
+    );
+
+    if(timePicked != null) {
+      var now = DateTime.now();
+      var formattedTime = DateFormat('HH:mm:ss').format(
+        DateTime(
+          now.year,
+          now.month, 
+          now.day, 
+          timePicked.hour, 
+          timePicked.minute
+        )
+      );
+      
+      if(whichTime == "start") {
+        setState(() {
+          formattedTimeStart = formattedTime;
+        });
+      }
+      if (whichTime == "end") {
+        setState(() {
+          formattedTimeEnd = formattedTime;
+        });
+      }
+      print("TIME SELECTED :::: $formattedTime");
+
+      var twelveHoursFormat = DateFormat('hh:mm a').format(
+        DateTime(
+          now.year,
+          now.month, 
+          now.day, 
+          timePicked.hour, 
+          timePicked.minute
+        )
+      );
+      // controller.text = formattedTime;
+      print("12 HOURS FORMAT :::: $twelveHoursFormat");
+      controller.text = twelveHoursFormat;
+    }
+    
+  }
+
   void fillOutForm(String section, String subjectName, String day, String timeStart, String timEnd) {
 
     _sectionController.text = section;
@@ -295,7 +345,10 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
 
                       const SizedBox(height: 20),
 
-                      MyTextFormField(
+                      ReadOnlyTextFormField(
+                        onTap: () {
+                          selectTime(_timeStartController, "start");
+                        },
                         controller: _timeStartController,
                         hintText: "Time-Start",
                         obscureText: false,
@@ -304,7 +357,10 @@ class _EditSubjectStateScreen extends State<EditSubjectScreen> {
            
                       const SizedBox(height: 20),
 
-                      MyTextFormField(
+                      ReadOnlyTextFormField(
+                        onTap: () {
+                          selectTime(_timeEndController, "end");
+                        },
                         controller: _timeEndController,
                         hintText: "Time-End",
                         obscureText: false,

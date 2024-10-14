@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:schedule_profs/box/boxes.dart';
-import 'package:schedule_profs/model/section_model.dart';
 import 'package:schedule_profs/screens/teacher_screen.dart';
 import 'package:schedule_profs/shared/alert.dart';
 import 'package:schedule_profs/shared/button.dart';
