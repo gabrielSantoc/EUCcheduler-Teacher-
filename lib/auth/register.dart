@@ -97,8 +97,6 @@ class _RegisterNewState extends State<RegisterScreen> {
             userId
           );
 
-
-
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const TeacherScreen())
@@ -231,7 +229,12 @@ class _RegisterNewState extends State<RegisterScreen> {
                         controller: _idNumberController,
                         hintText: "ID Number",
                         obscureText: false,
-                        validator: Validator.of(context).validateStudentNumber,
+                        validator: (value) => Validator.of(context).validateWithRegex(
+                          value, 
+                          "ID number cannot found", 
+                          "Student Number", 
+                          RegExp(r'^A\d{2}-\d{4}$')
+                        ),
                       ),
                   
                       const SizedBox(height: 20),
@@ -289,7 +292,7 @@ class _RegisterNewState extends State<RegisterScreen> {
                         controller: _confirmEmailController,
                         hintText: "Confirm email address",
                         obscureText: false,
-                        validator: (value)=> Validator.of(context).validateConfirmEmail(value, _emailController.text)
+                        validator: (value)=> Validator.of(context).validateConfirmation(value, _emailController.text, "Confirm Email")
                       ),
                       const SizedBox(height: 20),
                   
@@ -304,7 +307,7 @@ class _RegisterNewState extends State<RegisterScreen> {
 
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(builder: (context) => const LoginScreen())
                               );
