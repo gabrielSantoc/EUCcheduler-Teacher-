@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:schedule_profs/auth/forgot_password.dart';
 import 'package:schedule_profs/auth/register.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/main.dart';
@@ -245,8 +246,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       buttonName: "Login",
                     ),
+                    
+                    const SizedBox(height: 5),
+
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ForgotPasswordPage())
+                      ),
+                      child: const Text(
+                        "Forgot Password ?",
+                        style: TextStyle(
+                          color: MAROON,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                         
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 5),
                         
                     const Text(
                       "Your initial password is your birthdate\nin this format YYYY-MM-DD",
