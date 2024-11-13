@@ -4,8 +4,10 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:schedule_profs/auth/auth.dart';
+import 'package:schedule_profs/auth/change_password.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/main.dart';
+import 'package:schedule_profs/screens/teacher_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 const MAROON = Color(0xFF862349);
@@ -168,6 +170,13 @@ class DrawerClass extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.lock),
+            title: const Text('Change Password'),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangePasswordScreen()));
+            },
           ),
           ListTile(
             leading: const Icon(Icons.info),
