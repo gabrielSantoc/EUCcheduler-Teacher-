@@ -232,7 +232,7 @@ class _RegisterNewState extends State<RegisterScreen> {
                         validator: (value) => Validator.of(context).validateWithRegex(
                           value, 
                           "ID number cannot found", 
-                          "Student Number", 
+                          "ID Number", 
                           RegExp(r'^A\d{2}-\d{4}$')
                         ),
                       ),
