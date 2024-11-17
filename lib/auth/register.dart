@@ -112,7 +112,7 @@ class _RegisterNewState extends State<RegisterScreen> {
 
       } else {
           
-        Alert.of(context).showError("Student not found, please retry");
+        Alert.of(context).showError("User not found, please retry");
 
       }
 
