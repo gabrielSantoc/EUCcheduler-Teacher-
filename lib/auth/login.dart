@@ -130,9 +130,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
         
                   Text(
-                    "EYUschedule Profs",
+                    "EUCschedule Profs",
                     style: TextStyle(
-                      fontSize: 45,
+                      fontSize: 25,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -143,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     "Login in to Continue!",
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 15,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                     ),
