@@ -345,7 +345,6 @@ class _RegisterNewState extends State<RegisterScreen> {
                       ),
 
                       const SizedBox(height: 30),
-
                      
                     ],
                   ),
