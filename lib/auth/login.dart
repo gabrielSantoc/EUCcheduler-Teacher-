@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Supabase.instance.client
       .from('tbl_users')
       .select()
-      .eq('email', emailController.text.trim());
+      .eq('email', emailController.text.toString().trim());
   
       for (var data in user) {
         userInfo = UserModel(
@@ -51,29 +51,25 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
       
-      if(userInfo!.userType == 'professor') {
+      if(userInfo!.userType == 'professor' || userInfo!.userType == 'admin' ) {
         return true;
       }
+
+      Alert.of(context).showError("This app is designed for TEACHERS😎 only. If you are a student, please use the appropriate application.🥰🥰🥰");
       return false;
 
     } catch (e) {
 
-      Alert.of(context).showError("$e");
+      Alert.of(context).showError("${e}");
       return false;
     }
   }
 
   void login() async {
-
-    
-    if(!await validateUser()) {
-      Alert.of(context).showError("This app is designed for TEACHERS😎 only. If you are a student, please use the appropriate application.🥰🥰🥰");
-    }
     
     if(loginFormKey.currentState!.validate() && await validateUser()) {
-
+          
       try {
-
         LoadingDialog.showLoading(context);
         await Future.delayed(const Duration(seconds: 3));
         
