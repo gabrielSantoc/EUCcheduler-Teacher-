@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-env:
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  API_KEY: ${{ secrets.API_KEY }}
-
 jobs:  # Telling what jobs we need to happen
   build:      # Specify the building name and machine
     name: Build & Release  # you can name the build whatever you want
@@ -32,6 +28,12 @@ jobs:  # Telling what jobs we need to happen
         
     - name: Install Dependencies
       run: flutter pub get
+
+        # Set environment variables
+    - name: Export environment variables
+      run: |
+        echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> $GITHUB_ENV
+        echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
 
     - name: Build APK
       run: flutter build apk --release
