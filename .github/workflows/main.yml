@@ -26,15 +26,16 @@ jobs:  # Telling what jobs we need to happen
         flutter-version: '3.22.2'
         channel: 'stable'
         
-    - name: Install Dependencies
-      run: flutter pub get
-
     - name: 'Create env file'
     run: |
       touch .env
       echo SUPABASE_URL=${{ secrets.SUPABASE_URL }} >> .env
       echo API_KEY=${{ secrets.API_KEY }} >> .env
       cat .env
+        
+    - name: Install Dependencies
+      run: flutter pub get
+
 
     - name: Build APK
       run: flutter build apk --release
