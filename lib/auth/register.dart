@@ -233,7 +233,7 @@ class _RegisterNewState extends State<RegisterScreen> {
                           value, 
                           "ID number cannot found", 
                           "ID Number", 
-                          RegExp(r'^A\d{2}-\d{4}$')
+                          RegExp(r'(?<=-)\d{4}')
                         ),
                       ),
                   
