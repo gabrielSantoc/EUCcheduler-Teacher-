@@ -143,30 +143,13 @@ class DrawerClass extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
-          DrawerHeader(
+          const DrawerHeader(
             child: Stack(
               alignment: Alignment.center,
               children: [
                 CircleAvatar(
                   radius: 60,
-                  backgroundImage: profileImageUrl != null
-                      ? NetworkImage(profileImageUrl!)
-                      : const AssetImage('assets/images/placeholder.png') as ImageProvider,
-                ),
-                Positioned(
-                  right: 80,
-                  bottom: 10,
-                  child: GestureDetector(
-                    onTap: pickAndUploadImage,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: MAROON,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.add, color: Colors.white, size: 20),
-                    ),
-                  ),
+                  backgroundImage: AssetImage('assets/images/app-icon.png')
                 ),
               ],
             ),
@@ -181,12 +164,16 @@ class DrawerClass extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.info),
             title: const Text('About Developers'),
-            onTap: () {},
+            onTap: () {
+
+            },
           ),
           ListTile(
             leading: const Icon(Icons.help_center_rounded),
             title: const Text('FAQ'),
-            onTap: () {},
+            onTap: () {
+
+            },
           ),
           ListTile(
             leading: const Icon(Icons.logout_outlined),

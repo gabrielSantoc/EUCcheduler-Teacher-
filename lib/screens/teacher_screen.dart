@@ -126,15 +126,18 @@ class TeacherScreenState extends State<TeacherScreen> {
       appBar: AppBar(
         backgroundColor: MAROON,
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
+        actions: const [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0),
             child: CircleAvatar(
-              backgroundImage: profileImageUrl != null
-              ? NetworkImage(profileImageUrl!)
-              : const AssetImage('assets/images/placeholder.png')
-              as ImageProvider,
+              backgroundImage: AssetImage('assets/images/app-icon.png'),
             ),
+            // child: CircleAvatar(
+            //   backgroundImage: profileImageUrl != null
+            //   ? NetworkImage(profileImageUrl!)
+            //   : const AssetImage('assets/images/placeholder.png')
+            //   as ImageProvider,
+            // ),
           ),
         ],
       ),
