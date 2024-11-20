@@ -7,6 +7,7 @@ import 'package:schedule_profs/auth/auth.dart';
 import 'package:schedule_profs/auth/change_password.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/main.dart';
+import 'package:schedule_profs/screens/FAQ.dart';
 import 'package:schedule_profs/screens/teacher_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -172,7 +173,7 @@ class DrawerClass extends StatelessWidget {
             leading: const Icon(Icons.help_center_rounded),
             title: const Text('FAQ'),
             onTap: () {
-
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const FAQScreen()));
             },
           ),
           ListTile(
