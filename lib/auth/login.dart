@@ -120,35 +120,34 @@ class _LoginScreenState extends State<LoginScreen> {
               color: MAROON,
               height: MediaQuery.of(context).size.height * 0.5, 
 
-              child: const Column(
-
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 
                 children: [
         
-                  Text(
-                    "EUCcheduler(Teacher)",
+
+                                    
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.19, // 10% of screen height
+                    child: const Image(
+                      image: AssetImage("assets/images/app-logo-3.png"),
+                      fit: BoxFit.contain, // Ensures the image scales proportionally
+
+                    ),
+                  ),
+
+                  const Text(
+                    "Welcome Back 🥰",
                     style: TextStyle(
-                      fontSize: 25,
+                      fontSize: 23,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
         
-                  SizedBox(height: 10),
-                  
-                  Text(
-                    "Login in to Continue!",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.white,
-                    ),
-                  ),
                 ],
               ),
             ),
-            
             
             // BOTTOM MAROON CONTAINER
             Container(
