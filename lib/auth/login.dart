@@ -124,14 +124,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 
                 children: [
-        
-
-                                    
+                 
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.19, // 10% of screen height
+                    height: MediaQuery.of(context).size.height * 0.19,
                     child: const Image(
                       image: AssetImage("assets/images/app-logo-3.png"),
-                      fit: BoxFit.contain, // Ensures the image scales proportionally
+                      fit: BoxFit.contain
 
                     ),
                   ),
@@ -260,14 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         
                     const SizedBox(height: 5),
                         
-                    const Text(
-                      "Your initial password is your birthdate\nin this format YYYY-MM-DD",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    const PasswordGuide()
                     
                   ],
                 ),

@@ -8,6 +8,7 @@ import 'package:schedule_profs/auth/change_password.dart';
 import 'package:schedule_profs/box/boxes.dart';
 import 'package:schedule_profs/main.dart';
 import 'package:schedule_profs/screens/FAQ.dart';
+import 'package:schedule_profs/screens/about_dev_screen.dart';
 import 'package:schedule_profs/screens/teacher_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -166,7 +167,7 @@ class DrawerClass extends StatelessWidget {
             leading: const Icon(Icons.info),
             title: const Text('About Developers'),
             onTap: () {
-
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutDev()));
             },
           ),
           ListTile(
@@ -189,6 +190,47 @@ class DrawerClass extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+class PasswordGuide extends StatelessWidget {
+  const PasswordGuide({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric( horizontal: 25.0 ),
+      child: Text.rich(
+        TextSpan(
+          text: 'For new users, ',
+          children: <TextSpan>[
+            TextSpan(
+              text: 'your initial password ',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            TextSpan(
+              text: 'is your birthdate in this format ',
+            ),
+            TextSpan(
+              text: 'YYYY-MM-DD.',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w400,
+          color: Colors.black,
+        ),
       ),
     );
   }
