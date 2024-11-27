@@ -24,9 +24,10 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
   @override
   void initState() {
     super.initState();
-    getAllAvailableSections();
+    getAllAvailableCourses();
   }
 
+  final _courseController = TextEditingController();
   final _sectionController = TextEditingController();
   final _subjectNameController = TextEditingController();
   final _dayController = TextEditingController();
@@ -36,21 +37,83 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
   final addSubjectFormKey = GlobalKey<FormState>();
 
 
-  final List<String> _sections = [];
-  Future<void> getAllAvailableSections() async {
+    // Function to get all availabe courses
+  // Function to show the section picker
+
+  final List<String> _courses = [];
+  Future<void> getAllAvailableCourses() async {
     
     try{
       
       final selectAllSection = await 
       Supabase.instance.client
-      .from('tbl_section')
+      .from('tbl_courses')
       .select();
-      
       for(var s in selectAllSection) {
-        var section = SectionModel(
-          sectionName: s['section']
-        );
+        _courses.add(s['course']);
+      }
 
+      for(var c in _courses) {
+        print("COURSES ::: $c");
+      }
+
+    } catch (e) {
+      print("ERROR ::: $e");
+    }
+
+  }
+  Future<void> selectCourse() async {
+    // Show the Cupertino modal popup
+    await showCupertinoModalPopup<String>(
+      context: context,
+      builder: (_) {
+        return SizedBox(
+          width: double.infinity,
+          height: 250,
+          child: CupertinoPicker(
+            onSelectedItemChanged: (int value) {
+              
+              setState(() {
+                _courseController.text = _courses[value - 1];
+                _sectionController.text = '';
+                _sections.clear();
+              });
+              print('COURSE :::: ${_courses[value - 1]}'); 
+              getAllAvailableSections();
+            },
+            backgroundColor: Colors.white,
+            itemExtent: 30,
+            scrollController: FixedExtentScrollController(
+              initialItem: 0, 
+            ),
+            children: [
+              const Text('Select a Course', style: TextStyle(color: MAROON, fontWeight: FontWeight.bold)),
+              ..._courses.map((course) => Text(course))
+            ] 
+          ),
+        );
+      },
+    );
+  }
+
+
+
+  
+  // Function to get all availabe section
+  // Function to show the section picker
+  final List<String> _sections = [];
+  Future<void> getAllAvailableSections() async {
+
+    try{
+      
+      final selectAllSection = await 
+      Supabase.instance.client
+      .from('tbl_section')
+      .select()
+      .eq('course', _courseController.text);
+      _sections.clear();
+
+      for(var s in selectAllSection) {
         _sections.add(s['section']);
       }
 
@@ -64,9 +127,13 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
 
   }
 
-  // ANCHOR - SELECT SECTION FUNCTION
   Future<void> selectSection() async {
     // Show the Cupertino modal popup
+
+    if(_courseController.text.isEmpty || _courseController.text == "") {
+      return Alert.of(context).showError("Please select your course first. 😊");
+    }
+
     await showCupertinoModalPopup<String>(
       context: context,
       builder: (_) {
@@ -74,19 +141,26 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
           width: double.infinity,
           height: 250,
           child: CupertinoPicker(
-            onSelectedItemChanged: (int value) {
+            onSelectedItemChanged: (int value)async {
               
               setState(() {
-                _sectionController.text = _sections[value];
+                _sectionController.text = _sections[value - 1];
+
               });
-              print('SECTION :::: ${_sections[value]}'); 
+
+              print('SECTION :::: ${_sections[value - 1]}'); 
             },
             backgroundColor: Colors.white,
             itemExtent: 30,
             scrollController: FixedExtentScrollController(
               initialItem: 0, 
             ),
-            children: _sections.map((section) => Text(section)).toList(),
+            children: [
+
+              const Text('Select a Section', style: TextStyle(color: MAROON, fontWeight: FontWeight.bold)),
+              ..._sections.map((section) => Text(section))
+
+            ] 
           ),
         );
       },
@@ -94,7 +168,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
   }
 
   // ANCHOR - SELECT DAY FUNCTION
-  final List<String> _dayOfWeek = [ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ];
+  final List<String> _dayOfWeek = [ '', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ];
   Future<void> selectDay() async {
     // Show the Cupertino modal popup
     await showCupertinoModalPopup<String>(
@@ -273,12 +347,35 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                       
                       const SizedBox(height: 40),
 
-                      ReadOnlyTextFormField(
-                        onTap: selectSection,
-                        controller: _sectionController,
-                        hintText: "Section",
-                        obscureText: false,
-                        validator: (value)=> Validator.of(context).validateTextField(value, "Section"),
+                        Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 25),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: MyTextFormFieldShortReadOnly(
+                                onTap: selectCourse,
+                                controller: _courseController,
+                                hintText: "Course",
+                                obscureText: false,
+                                validator: (value)=> Validator.of(context).validateTextField(value, "Course"),
+                              ),
+                            ),
+                  
+                            const SizedBox(width: 5),
+                  
+                            Expanded(
+                              child: MyTextFormFieldShortReadOnly(
+                                onTap: selectSection,
+                                controller: _sectionController,
+                                hintText: "Section",
+                                obscureText: false,
+                                validator: (value)=> Validator.of(context).validateTextField(value, "Section"),
+                              ),
+                            ),
+                        
+                        
+                          ],
+                        ),
                       ),
 
                       const SizedBox(height: 20),
