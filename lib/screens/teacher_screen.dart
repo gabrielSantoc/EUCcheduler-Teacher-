@@ -10,6 +10,7 @@ import 'package:schedule_profs/screens/add_subject.dart';
 import 'package:schedule_profs/screens/view_page.dart';
 import 'package:schedule_profs/screens/view_page_offline.dart';
 import 'package:schedule_profs/services/db_service.dart';
+import 'package:schedule_profs/shared/alert.dart';
 import 'package:schedule_profs/shared/constants.dart';
 import 'package:schedule_profs/shared/schedule_list_item.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -29,6 +30,8 @@ class TeacherScreenState extends State<TeacherScreen> {
   final ScrollController _scrollController = ScrollController();
   String? profileImageUrl;
 
+  late StreamSubscription _internetConnectionStreamSubscription;
+  bool isConnectedTointernet = false;
 
   @override
   void dispose() {
@@ -40,8 +43,45 @@ class TeacherScreenState extends State<TeacherScreen> {
   void initState() {
     getCredentials();
 
+    // Check initial connectivity first
+    InternetConnection().hasInternetAccess.then((hasInternet) {
+      setState(() {
+        isConnectedTointernet = hasInternet;
+        print("INITIAL STATE $isConnectedTointernet");
+      });
+    });
+
+    _internetConnectionStreamSubscription = InternetConnection().onStatusChange.listen((event) {
+      print("EVENT ::: $event");
+      
+      switch(event) {
+        case InternetStatus.connected: 
+          setState(() {
+            isConnectedTointernet = true;
+            print("INTERNET CONNECTION ::: $isConnectedTointernet");
+          });
+          break;
+        case InternetStatus.disconnected:
+          setState(() {
+            isConnectedTointernet = false;
+            print("INTERNET CONNECTION ::: $isConnectedTointernet");
+          });
+          break;
+        default:
+          isConnectedTointernet = false;
+          break;
+      }
+    });
+    
+    @override
+    void dispose() {
+      _internetConnectionStreamSubscription.cancel();
+      super.dispose();
+    }
+
     super.initState();
   }
+
 
   // So need ko gumawa dito ng query para makuha yung mga credential ng specific user na nag login, gagamitin ko yung user id na nilagay ko sa hive
   UserModel? userInfo; // Bali laman nito yung credentials nung user na ni query,
@@ -87,6 +127,11 @@ class TeacherScreenState extends State<TeacherScreen> {
 
       floatingActionButton: FloatingActionButton.extended( //ANCHOR - FLOATING ACTION BUTTON
         onPressed: () {
+
+          if(isConnectedTointernet == false) {
+            return Alert.of(context).showError("Internet connection is required to add a schedule 😊");
+          }
+
           Navigator.push(
             context, 
             MaterialPageRoute(builder: (context)=> const AddSubjectScreen())
@@ -98,7 +143,7 @@ class TeacherScreenState extends State<TeacherScreen> {
             Icon(Icons.add, color: WHITE),
             SizedBox(width: 5),
             Text(
-              "Add Subject",
+              "Add Schedule",
               style: TextStyle(
                 color: WHITE,
                 fontSize: 12,

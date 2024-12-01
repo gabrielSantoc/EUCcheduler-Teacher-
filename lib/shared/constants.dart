@@ -139,8 +139,11 @@ class DrawerClass extends StatelessWidget {
             leading: const Icon(Icons.logout_outlined),
             title: const Text('Sign Out'),
             onTap: () async {
+              LoadingDialog.showLoading(context);
+              await Future.delayed(const Duration(seconds: 2));
+              LoadingDialog.hideLoading(context);
+              await boxUserCredentials.clear();
               await supabase.auth.signOut();
-              boxUserCredentials.clear();
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AuthScreen()),
