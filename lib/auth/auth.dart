@@ -74,7 +74,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
           } else if(snapshot.hasError) {
 
-            return Center(child: Text('Error: ${snapshot.error}'));
+            print('Error: ${snapshot.error}');
+            return const TeacherScreen();
             
           } else {
             return const Center(child: CircularProgressIndicator());

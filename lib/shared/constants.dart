@@ -96,49 +96,7 @@ void showConfirmDialog(BuildContext context, String title, String content, VoidC
 
 
 class DrawerClass extends StatelessWidget {
-  final String? profileImageUrl;
-  final VoidCallback onProfileImageChanged;
-
-  const DrawerClass({
-    super.key, 
-    required this.profileImageUrl,
-    required this.onProfileImageChanged,
-  });
-
-  Future<void> pickAndUploadImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      final file = File(pickedFile.path);
-      final fileName = '${boxUserCredentials.get('userId')}_${path.basename(file.path)}';
-
-      // Delete existing profile picture if there's one
-      String? oldFilePath = boxUserCredentials.get("filePath");
-      if (oldFilePath != null) {
-        await Supabase.instance.client.storage
-            .from('profile_pictures')
-            .remove([oldFilePath]);
-      }
-
-
-      // Upload new image
-      await Supabase.instance.client.storage
-          .from('profile_pictures')
-          .upload(fileName, file);
-          
-      // Update file path in tbl_users
-      await Supabase.instance.client.from('tbl_users').update({
-        'file_path': fileName,
-      }).eq('auth_id', boxUserCredentials.get('userId'));
-
-      // Update local storage
-      await boxUserCredentials.put("filePath", fileName);
-      
-      // Notify parent to reload profile image
-      onProfileImageChanged();
-    }
-  }
+  const DrawerClass({super.key});
 
   @override
   Widget build(BuildContext context) {

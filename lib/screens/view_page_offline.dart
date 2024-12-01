@@ -15,7 +15,7 @@ import 'package:schedule_profs/shared/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-class ViewPage extends StatefulWidget {
+class ViewPageOffline extends StatefulWidget {
   final int schedId;
   final String? profName;
   final String subjectName;
@@ -24,7 +24,7 @@ class ViewPage extends StatefulWidget {
   final String endTime;
   final String day;
 
-  const ViewPage({
+  const ViewPageOffline({
     required this.schedId,
     this.profName,
     required this.subjectName,
@@ -36,10 +36,10 @@ class ViewPage extends StatefulWidget {
   });
 
   @override
-  ViewPageState createState() => ViewPageState();
+  ViewPageOfflineState createState() => ViewPageOfflineState();
 }
 
-class ViewPageState extends State<ViewPage> {
+class ViewPageOfflineState extends State<ViewPageOffline> {
 
   late StreamSubscription _internetConnectionStreamSubscription;
   bool isConnectedTointernet = false;
@@ -48,7 +48,7 @@ class ViewPageState extends State<ViewPage> {
   void initState() {
     super.initState();
 
-    // Check initial connectivity first
+     // Check initial connectivity first
     InternetConnection().hasInternetAccess.then((hasInternet) {
       setState(() {
         isConnectedTointernet = hasInternet;
@@ -76,6 +76,7 @@ class ViewPageState extends State<ViewPage> {
           isConnectedTointernet = false;
           break;
       }
+      
     });
 
   }
@@ -115,59 +116,59 @@ class ViewPageState extends State<ViewPage> {
 
         actions: [
           
-          IconButton(
-            onPressed: () {
+          // IconButton(
+          //   onPressed: () {
 
-              if(isConnectedTointernet == false) {
-                return Alert.of(context).showError("Internet connection is required to delete schedule 😊");
-              }
-              showConfirmDialog(
-                context,
-                'Delete Subject',
-                'Are you sure you want to delete this Subject?',
-                (){
-                  deleteSubject(widget.schedId);
-                }
-              );
+          //     if(isConnectedTointernet == false) {
+          //       return Alert.of(context).showError("Internet connection is required to delete schedule 😊");
+          //     }
+          //     showConfirmDialog(
+          //       context,
+          //       'Delete Subject',
+          //       'Are you sure you want to delete this Subject?',
+          //       (){
+          //         deleteSubject(widget.schedId);
+          //       }
+          //     );
 
-            } ,
-            icon: const Icon(Icons.delete, color: WHITE,),
-          ),
+          //   } ,
+          //   icon: const Icon(Icons.delete, color: WHITE,),
+          // ),
         ],
       ),
       
 
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () {
           
-          if(isConnectedTointernet == false) {
-            return Alert.of(context).showError("Internet connection is required to add an announcement 😊");
-          }
+      //     if(isConnectedTointernet == false) {
+      //       return Alert.of(context).showError("Internet connection is required to add an announcement 😊");
+      //     }
 
-          Navigator.push(
-            context, 
-            MaterialPageRoute(builder: (context)=> AddAnnouncementScreen(schedId: widget.schedId))
-          );
-        },
-        backgroundColor: MAROON,
-        label: const Row(
-          children: [
+      //     Navigator.push(
+      //       context, 
+      //       MaterialPageRoute(builder: (context)=> AddAnnouncementScreen(schedId: widget.schedId))
+      //     );
+      //   },
+      //   backgroundColor: MAROON,
+      //   label: const Row(
+      //     children: [
 
-            Icon(Icons.add, color: WHITE),
+      //       Icon(Icons.add, color: WHITE),
             
-            SizedBox(width: 5),
+      //       SizedBox(width: 5),
 
-            Text(
-              "Add Announcement",
-              style: TextStyle(
-                color: WHITE,
-                fontSize: 12,
-              ),
-            )
+      //       Text(
+      //         "Add Announcement",
+      //         style: TextStyle(
+      //           color: WHITE,
+      //           fontSize: 12,
+      //         ),
+      //       )
 
-          ],
-        ),
-      ),
+      //     ],
+      //   ),
+      // ),
       
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -235,26 +236,26 @@ class ViewPageState extends State<ViewPage> {
             ),
           ),
 
-          MyButton2( // ANCHOR - PAGE ROUTE FOR EDIT SUBJECT SCREEN
-            onTap: (){
-              if(isConnectedTointernet == false) {
-                return Alert.of(context).showError("Internet connection is required to edit subject 😊");
-              }
+          // MyButton2( // ANCHOR - PAGE ROUTE FOR EDIT SUBJECT SCREEN
+          //   onTap: (){
+          //     if(isConnectedTointernet == false) {
+          //       return Alert.of(context).showError("Internet connection is required to edit subject 😊");
+          //     }
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context)=> EditSubjectScreen( 
-                  schedId: widget.schedId,
-                  section: widget.section,
-                  subjectName: widget.subjectName,
-                  day: widget.day,
-                  startTime: widget.startTime,
-                  endTime: widget.endTime
-                ))
-              );
-            }, 
-            buttonName: "Edit Subject"
-          ),
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context)=> EditSubjectScreen( 
+          //         schedId: widget.schedId,
+          //         section: widget.section,
+          //         subjectName: widget.subjectName,
+          //         day: widget.day,
+          //         startTime: widget.startTime,
+          //         endTime: widget.endTime
+          //       ))
+          //     );
+          //   }, 
+          //   buttonName: "Edit Subject"
+          // ),
 
           const SizedBox(height: 10),
 
@@ -457,58 +458,58 @@ class _AnnouncementCardState extends State<AnnouncementCard> {
                             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
 
-                          PopupMenuButton( // ANCHOR - POP-UP MENU
-                            color: WHITE,
-                            padding: EdgeInsets.zero,
-                            itemBuilder: (context) => [
+                          // PopupMenuButton( // ANCHOR - POP-UP MENU
+                          //   color: WHITE,
+                          //   padding: EdgeInsets.zero,
+                          //   itemBuilder: (context) => [
                               
-                              PopupMenuItem( // ANCHOR - EDIT ANNOUNCEMENT
-                                onTap: (){
+                          //     PopupMenuItem( // ANCHOR - EDIT ANNOUNCEMENT
+                          //       onTap: (){
 
-                                  print("ANNOUNCEMENT ID ::::: ${announcement.id}");
-                                  Navigator.push(
-                                    context, 
-                                    MaterialPageRoute(builder: (context)=>  EditAnnouncement(
-                                      announcementId: announcement.id,
-                                      title: announcement.title,
-                                      content: announcement.content,
-                                    ))
-                                  );
-                                },  
-                                child: const ListTile(
-                                  leading: Icon(Icons.edit_document ),
-                                  title: Text('Edit'),
-                                ),
-                              ),
+                          //         print("ANNOUNCEMENT ID ::::: ${announcement.id}");
+                          //         Navigator.push(
+                          //           context, 
+                          //           MaterialPageRoute(builder: (context)=>  EditAnnouncement(
+                          //             announcementId: announcement.id,
+                          //             title: announcement.title,
+                          //             content: announcement.content,
+                          //           ))
+                          //         );
+                          //       },  
+                          //       child: const ListTile(
+                          //         leading: Icon(Icons.edit_document ),
+                          //         title: Text('Edit'),
+                          //       ),
+                          //     ),
                           
-                              PopupMenuItem( // ANCHOR - DELETE ANNOUNCEMENT
+                          //     PopupMenuItem( // ANCHOR - DELETE ANNOUNCEMENT
                               
-                                onTap: () {
-                                  showConfirmDialog(
-                                    context,
-                                    'Delete Announcement',
-                                    'Are you sure you want to delete this Announcment?',
-                                    (){
-                                      deleteAnnouncement(announcement.id);
-                                    }
-                                  );
+                          //       onTap: () {
+                          //         showConfirmDialog(
+                          //           context,
+                          //           'Delete Announcement',
+                          //           'Are you sure you want to delete this Announcment?',
+                          //           (){
+                          //             deleteAnnouncement(announcement.id);
+                          //           }
+                          //         );
 
-                                },
-                                child: const ListTile(
-                                  leading: Icon(Icons.delete),
-                                  title: Text('Delete'),
-                                ),
-                              ),  
-                            ],
-                            child: Container(
-                              height: 36,
-                              width: 48,
-                              alignment: Alignment.centerRight,
-                              child: const Icon(
-                                Icons.more_vert,
-                              ),
-                            ),
-                          )
+                          //       },
+                          //       child: const ListTile(
+                          //         leading: Icon(Icons.delete),
+                          //         title: Text('Delete'),
+                          //       ),
+                          //     ),  
+                          //   ],
+                          //   child: Container(
+                          //     height: 36,
+                          //     width: 48,
+                          //     alignment: Alignment.centerRight,
+                          //     child: const Icon(
+                          //       Icons.more_vert,
+                          //     ),
+                          //   ),
+                          // )
                         ] ,
                       ),
 

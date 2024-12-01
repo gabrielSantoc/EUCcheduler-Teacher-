@@ -1,17 +1,20 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:schedule_profs/box/boxes.dart';
+import 'package:schedule_profs/model/announcement_model.dart';
 import 'package:schedule_profs/model/schedule_model.dart';
 import 'package:schedule_profs/model/user_model.dart';
 import 'package:schedule_profs/screens/add_subject.dart';
 import 'package:schedule_profs/screens/view_page.dart';
+import 'package:schedule_profs/screens/view_page_offline.dart';
+import 'package:schedule_profs/services/db_service.dart';
 import 'package:schedule_profs/shared/constants.dart';
 import 'package:schedule_profs/shared/schedule_list_item.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:shimmer_animation/shimmer_animation.dart';
 
 class TeacherScreen extends StatefulWidget {
   const TeacherScreen({super.key});
@@ -39,16 +42,6 @@ class TeacherScreenState extends State<TeacherScreen> {
 
     super.initState();
   }
-  //check for filepath in hive, then use that to generate a url to get the profile
-  void loadProfileImage() {
-    String? filePath = boxUserCredentials.get("filePath");
-    if (filePath != null) {
-      profileImageUrl = Supabase.instance.client.storage
-          .from('profile_pictures')
-          .getPublicUrl(filePath);
-      setState(() {});
-    }
-  }
 
   // So need ko gumawa dito ng query para makuha yung mga credential ng specific user na nag login, gagamitin ko yung user id na nilagay ko sa hive
   UserModel? userInfo; // Bali laman nito yung credentials nung user na ni query,
@@ -72,21 +65,14 @@ class TeacherScreenState extends State<TeacherScreen> {
       );
     }
 
-    //para sure na may laman
-    if (userInfo!.filePath != null) {
-      await boxUserCredentials.put("filePath", "${userInfo!.filePath}");
-    }
-
-    if (userInfo!.firstName != null && userInfo!.lastName != null) {
-      await boxUserCredentials.put("profName", "${userInfo!.firstName} ${userInfo!.lastName}");
-    }
+    await boxUserCredentials.put("userFirstName", userInfo?.firstName);
+    await boxUserCredentials.put("userLastName", userInfo?.lastName);
+    await boxUserCredentials.put("profName", "${userInfo!.firstName} ${userInfo!.lastName}");
   
-    // await boxUserCredentials.put("filePath", "${userInfo!.filePath}");
-    // await boxUserCredentials.put("profName", "${userInfo!.firstName} ${userInfo!.lastName}");
-    
-    print("PROF FULL NAME HIVEEE::: ${boxUserCredentials.get("profName")}");
-    //to make sure hive has content before fetching profile picture
-    loadProfileImage();
+    print("USER FIRSTNAME :::: ${boxUserCredentials.get("userFirstName")}");
+    print("USER LASTNAME:::: ${boxUserCredentials.get("userLastName")}");
+    print("USER FULL NAME:::: ${boxUserCredentials.get("profName")}");
+
     setState(() {});
   }
 
@@ -132,19 +118,10 @@ class TeacherScreenState extends State<TeacherScreen> {
             child: CircleAvatar(
               backgroundImage: AssetImage('assets/images/app-icon.png'),
             ),
-            // child: CircleAvatar(
-            //   backgroundImage: profileImageUrl != null
-            //   ? NetworkImage(profileImageUrl!)
-            //   : const AssetImage('assets/images/placeholder.png')
-            //   as ImageProvider,
-            // ),
           ),
         ],
       ),
-      drawer: DrawerClass(
-        profileImageUrl: profileImageUrl,
-        onProfileImageChanged: loadProfileImage,
-      ),
+      drawer: const DrawerClass(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -153,29 +130,17 @@ class TeacherScreenState extends State<TeacherScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                userInfo != null
-                ? 
                 Text(
-                  "${userInfo!.firstName} ${userInfo!.lastName}",
+                  "${boxUserCredentials.get("userFirstName")} ${boxUserCredentials.get("userLastName")}",
                   style: const TextStyle(
                     fontSize: 30,
                     color: WHITE,
                     fontWeight: FontWeight.bold
                   ),
-                )
-                : Shimmer(
-                  child: Container(
-                    height: 40,
-                    width: 300,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(28, 158, 158, 158),
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                  )
                 ),
 
                 const SizedBox(height: 6),
-                // userInfo != null
+                
                 const Text(
                   "Professor",
                   style: TextStyle(
@@ -183,16 +148,7 @@ class TeacherScreenState extends State<TeacherScreen> {
                     color: WHITE,
                   ),
                 )
-                // : Shimmer(
-                //   child: Container(
-                //     height: 30,
-                //     width: 100,
-                //     decoration: BoxDecoration(
-                //       color: const Color.fromARGB(26, 158, 158, 158),
-                //       borderRadius: BorderRadius.circular(10)
-                //     ),
-                //   )
-                // ),
+
               ],
             ),
           ),
@@ -298,12 +254,54 @@ class _ScheduleListState extends State<ScheduleList> {
   Map<int, String> latestAnnouncementTimes = {};
 
   late String profName = boxUserCredentials.get("profName");
+  final DatabaseService _databaseService =  DatabaseService.instance;
+
+  StreamSubscription? _internetConnectionStreamSubscription;
+  bool isConnectedTointernet = false;
 
   @override
   void initState() {
     super.initState();
     initHive();
     schedFuture = fetchSched();
+    _databaseService.fetchAndPrintAllSchedules();
+
+    // Check initial connectivity first
+    InternetConnection().hasInternetAccess.then((hasInternet) {
+      setState(() {
+        isConnectedTointernet = hasInternet;
+        print("INITIAL STATE $isConnectedTointernet");
+      });
+    });
+
+    _internetConnectionStreamSubscription = InternetConnection().onStatusChange.listen((event) {
+      print("EVENT ::: $event");
+      switch(event) {
+        case InternetStatus.connected:
+          setState(() {
+            isConnectedTointernet = true;
+          });
+          break;
+        case InternetStatus.disconnected:
+          setState(() {
+            isConnectedTointernet = false;
+          });
+          break;
+        default:
+          setState(() {
+            isConnectedTointernet = false;
+          });
+          break;
+      }
+    });
+  }
+
+   
+
+  @override
+  void dispose() {
+    _internetConnectionStreamSubscription?.cancel();
+    super.dispose();
   }
 
   void initHive() async {
@@ -313,8 +311,10 @@ class _ScheduleListState extends State<ScheduleList> {
   }
 
   Future<void> loadData() async {
-    schedFuture = fetchSched();
     await checkForNewAnnouncements();
+    await checkIfTblSchedulehasBeenModified();
+    await checkIftblAnnouncementshasBeenModified() ;
+    schedFuture = fetchSched();
     widget.refreshUserInfo();
     fetchSched();
     setState(() {});
@@ -334,6 +334,20 @@ class _ScheduleListState extends State<ScheduleList> {
         .order('start_time', ascending: true);
 
       return SchedModel.jsonToList(response);
+    } catch (e) {
+      print('Error fetching schedules: $e');
+      return _databaseService.fetchSchedulesFromLocalStorage(); // fetch data from local storage
+    }
+  }
+
+  Future<List<AnnouncementModel>> fetchAnnouncement() async {
+    try {
+      final response =  await supabase
+      .from('tbl_announcement')
+      .select()
+      .order('created_at', ascending: true);
+
+      return AnnouncementModel.jsonToList(response);
     } catch (e) {
       print('Error fetching schedules: $e');
       return [];
@@ -413,6 +427,114 @@ class _ScheduleListState extends State<ScheduleList> {
     );
   }
 
+  // ANCHOR LOCAL STORAGE 
+  Future<void> fetchAndStoreSchedToLocalStorage() async {
+    // Fetch schedules from Supabase
+    List<SchedModel> schedules = await fetchSched();
+    
+    if (schedules.isNotEmpty) {
+      // Insert schedules into SQLite database
+      await _databaseService.clearTable("tbl_schedules");
+      await _databaseService.insertSchedules(schedules);
+    } else {
+      print("No schedules to store in SQLite.");
+    }
+  }
+
+  Future<void> fetchAndStoreAnnouncementToLocalStorage() async {
+    // Fetch schedules from Supabase
+    List<AnnouncementModel> announcements = await fetchAnnouncement();
+    
+    if (announcements.isNotEmpty) {
+      // Insert announcements into SQLite database
+      await _databaseService.clearTable("tbl_announcements");
+      await _databaseService.insertAnnouncements(announcements);
+    } else {
+      print("No schedules to store in SQLite.");
+    }
+  }
+
+  // Function to check if the table has new schedule entry.
+  // If there is, it will update fetch the remote db and update the local storage.
+  Future<void> checkIfTblSchedulehasBeenModified() async {
+     
+    try {
+
+      final getlastScheduleId = await 
+        Supabase.instance.client
+        .from('tbl_schedule')
+        .select('schedule_id')
+        .order('schedule_id', ascending: false)
+        .limit(1);
+
+      print("LAST SCHEDULE ID RESPONSE :::: $getlastScheduleId");
+      String lastScheduleIdNew = getlastScheduleId[0]['schedule_id'].toString();
+
+
+      var lastScheduleIdFromHive = await boxUserCredentials.get('last-schedule-id');
+      print("LAST MODIFIED NEW       ::: $lastScheduleIdNew");
+      print("LAST MODIFIED FROM HIVE ::: $lastScheduleIdFromHive");
+
+
+      if(lastScheduleIdFromHive != lastScheduleIdNew) {
+        await boxUserCredentials.put('last-schedule-id', lastScheduleIdNew);
+        await fetchAndStoreSchedToLocalStorage();
+
+        // Alert.of(context).showSuccess('Schedules have been updated successfully! 🥰🥰🥰');
+      } else {
+        await fetchSched();
+        // Alert.of(context).showSuccess('Schedule is still up to date". 🥰🥰🥰');
+      }
+
+    } on Exception catch(e) {
+
+      await fetchSched();
+      print("EXCEPTION ON checkIfTblSchedulehasBeenModified() FUNCTION ::::: $e");
+      
+    } 
+  }
+
+  Future<void> checkIftblAnnouncementshasBeenModified() async {
+     
+    try {
+
+      final getAnnouncementId = await 
+        Supabase.instance.client
+        .from('tbl_announcement')
+        .select('id')
+        .order('id', ascending: false)
+        .limit(1);
+
+      print("LAST ANNOUNCEMENT ID RESPONSE :::: $getAnnouncementId");
+      String lastAnnouncementIdNew = getAnnouncementId[0]['id'].toString();
+
+
+      var lastAnnouncementIdFromHive = await boxUserCredentials.get('last-announcement-id');
+      print("LAST ANNOUNCEMENT ID NEW       ::: $lastAnnouncementIdNew");
+      print("LAST MODIFIED FROM HIVE ::: $lastAnnouncementIdFromHive");
+
+
+      if(lastAnnouncementIdFromHive != lastAnnouncementIdNew) {
+
+        await boxUserCredentials.put('last-announcement-id', lastAnnouncementIdNew);
+        await fetchAndStoreAnnouncementToLocalStorage();
+
+        // Alert.of(context).showSuccess('Announcements have been updated successfully". 🥰🥰🥰');
+      } else {
+        await fetchAnnouncement();
+        // Alert.of(context).showSuccess('Announcements is still up to date". 🥰🥰🥰');
+      }
+
+    } on Exception catch(e) {
+
+      print("EXCEPTION ON checkIftblAnnouncementshasBeenModified() FUNCTION ::::: $e");
+      
+    } 
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -489,14 +611,25 @@ class _ScheduleListState extends State<ScheduleList> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ViewPage(
+                      builder: (context) => 
+                      isConnectedTointernet ? 
+                      ViewPage(
                         startTime: schedule.startTime,
                         endTime: schedule.endTime,
                         subjectName: schedule.subject,
                         section: schedule.section,
                         schedId: schedule.schedId,
                         day: schedule.dayOfWeek,
-                      ),
+                      )
+                      :
+                      ViewPageOffline(
+                        startTime: schedule.startTime,
+                        endTime: schedule.endTime,
+                        subjectName: schedule.subject,
+                        section: schedule.section,
+                        schedId: schedule.schedId,
+                        day: schedule.dayOfWeek,
+                      )
                     ),
                   );
                 },
